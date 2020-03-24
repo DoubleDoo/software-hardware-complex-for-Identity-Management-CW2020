@@ -1,0 +1,30 @@
+[
+  {
+    "ID": "c:@F@main#",
+    "What": "Function",
+    "defdec": "Def",
+    "display": "int main(void)",
+    "location": {
+      "column": "5",
+      "line": "3",
+      "path": "D:\\GIT\\software-hardware-complex-for-Identity-Management\\Software\\friimeware\\main.cpp"
+    },
+    "name": "main",
+    "origin": "project_file",
+    "scope": null
+  },
+  {
+    "ID": "c:main.cpp@106@F@main#@gpio",
+    "What": "Variable",
+    "defdec": "Def",
+    "display": "gpio",
+    "location": {
+      "column": "20",
+      "line": "9",
+      "path": "D:\\GIT\\software-hardware-complex-for-Identity-Management\\Software\\friimeware\\main.cpp"
+    },
+    "name": "gpio",
+    "origin": "project_file",
+    "scope": null
+  }
+]
