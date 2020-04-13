@@ -26,6 +26,10 @@
 /* USER CODE BEGIN Includes */
 #include "ssd1306.h"
 #include "fonts.h"
+#include "data.h"
+#include "stm32f2xx_it.h"
+//#include "stdbool.h"
+//#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -37,8 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define FLASH_KEY1               ((uint32_t)0x45670123)
-#define FLASH_KEY2               ((uint32_t)0xCDEF89AB)
+
 
 /* USER CODE END PD */
 
@@ -60,6 +63,8 @@ I2C_HandleTypeDef hi2c1;
 
 RNG_HandleTypeDef hrng;
 
+TIM_HandleTypeDef htim6;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -72,6 +77,7 @@ static void MX_HASH_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_RNG_Init(void);
 static void MX_CRC_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -88,7 +94,14 @@ static void MX_CRC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	leftButtonStatus=0;
+	rightButtonStatus=0;
+	bothButtonStatus=0;
+	//endDataPointer=0;
+	//startDataPointer=0;
+	//dataReciveBufer[0]=(char)'t';
+	//dataReciveBufer[1]=(char)'s';
+	//endDataPointer=2;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -115,148 +128,152 @@ int main(void)
   MX_RNG_Init();
   MX_CRC_Init();
   MX_USB_DEVICE_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
    ssd1306_Init();
+   ssd1306_Fill(White);
+   ssd1306_UpdateScreen();
    ssd1306_Fill(Black);
    ssd1306_UpdateScreen();
-   ssd1306_SetCursor(20,20);
-   ssd1306_WriteString("test", Font_7x10, White);
-   ssd1306_SetCursor(40,40);
-   ssd1306_WriteString("word", Font_7x10, White);
-   ssd1306_UpdateScreen();
-   ssd1306_SetCursor(30,30);
-   HAL_Delay(1000);
+   //пример записи в память
 
-   const char wmsg[] = "Some data";
-      char rmsg[sizeof(wmsg)]="a";
-      // HAL expects address to be shifted one bit to the left
-      uint16_t devAddr = (0x50 << 1);
-      uint16_t memAddr = 0x0101;
-      HAL_StatusTypeDef status;
 
-      HAL_I2C_Mem_Write(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_16BIT, (uint8_t*)wmsg, sizeof(wmsg), HAL_MAX_DELAY);
-      for(;;) { // wait...
-       status = HAL_I2C_IsDeviceReady(&hi2c1, devAddr, 1,HAL_MAX_DELAY);
-       if(status == HAL_OK)
-    	   ssd1306_SetCursor(25,25);
-    	     ssd1306_WriteString(wmsg, Font_7x10, White);
-                  break;
-       }
+   //uint8_t wmsg[] ={'A','B','C'};
+   //char rmsg[64]="a";
+  // HAL_Delay(5000);
+/*
+   uint16_t memoryAddres = 0x1000;
+   char inp1[64]="Dubinich1       Password1       habr1.ru        105             ";
+   char inp2[64]="Dubinich2       Password2       habr2.ru        105             ";
+   char inp3[64]="Dubinich3       Password3       habr3.ru        105             ";
+   char inp4[64]="";
+   writeToEeprom(memoryAddres, inp1,64);
+   HAL_Delay(100);
+   writeToEeprom(memoryAddres+64, inp2,64);
+   HAL_Delay(100);
+   writeToEeprom(memoryAddres+64+64, inp3,64);
+   HAL_Delay(100);
+   writeToEeprom(memoryAddres+64+64+64, inp4,64);
+      HAL_Delay(100);
+      */
+
+
+
+   //writeToEeprom(memoryAddres, inp3,sizeof(wmsg));
+/*
+   HAL_Delay(100);
+   //readFromEeprom(memoryAddres,rmsg,sizeof(wmsg));
+
+
+   readFromEeprom(memoryAddres,inp1,64);
+   HAL_Delay(100);
+   readFromEeprom(memoryAddres+64,inp2,64);
+   HAL_Delay(100);
+   readFromEeprom(memoryAddres+64+64,inp3,64);
+   HAL_Delay(100);
+
+   CDC_Transmit_FS(inp3, 64);
       HAL_Delay(1000);
 
-      HAL_I2C_Mem_Read(&hi2c1, devAddr, memAddr, I2C_MEMADD_SIZE_16BIT,(uint8_t*)rmsg, sizeof(rmsg), HAL_MAX_DELAY);
-          if(memcmp(rmsg, wmsg, sizeof(rmsg)) == 0) {
-              const char result[] = "Test passed!\r\n";
-              ssd1306_SetCursor(0,0);
-                ssd1306_WriteString(&result, Font_7x10, White);
+      CDC_Transmit_FS(inp2, 64);
+         HAL_Delay(1000);
 
-          } else {
-              const char result[] = "Test failed :(\r\n";
+         CDC_Transmit_FS(inp1, 64);
+            HAL_Delay(1000);
 
-              ssd1306_SetCursor(0,0);
-                ssd1306_WriteString(&result, Font_7x10, White);
-          }
-          HAL_Delay(1000);
-   ssd1306_SetCursor(40,40);
-   ssd1306_WriteString(&rmsg, Font_7x10, White);
-   //ssd1306_SetCursor(50,50);
-     // ssd1306_WriteString(10, Font_7x10, White);
-     // ssd1306_WriteString(15, Font_7x10, White);
-   ssd1306_UpdateScreen();
+            */
+   //--------------------
+  // HAL_Delay(3000);
    /*
-   uint8_t send_buff[] = "SPI WORKING!!! ";
-    uint8_t dev_wr[1] = { 0b00000010 };
-    uint8_t dev_rd[1] = { 0b00000011 };
-    uint8_t dev_ress[1]= { 0x0202 };
-    uint8_t dev_addr[1]= { 0x0202  };
-    uint8_t deta[1]=    { 0b10101010 };
+   accauntBlock tst;
+   char* inpp="Dubinich        Password        habr.ru         105             ";
+   stringToStruct(inpp, &tst);
+   char out[64]="";
+   structToString(&tst,out);
+  // visualizeStruct(&tst);
+   HAL_Delay(1000);
 
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
-   HAL_StatusTypeDef res1 = HAL_SPI_Transmit(&hspi1, dev_wr, sizeof(dev_wr),HAL_MAX_DELAY);
-   HAL_StatusTypeDef res2 = HAL_SPI_Transmit(&hspi1, dev_addr, sizeof(dev_addr),HAL_MAX_DELAY);
-   HAL_StatusTypeDef res3 = HAL_SPI_Transmit(&hspi1, deta, sizeof(deta),HAL_MAX_DELAY);
-
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
-   HAL_StatusTypeDef res4 = HAL_SPI_Transmit(&hspi1, dev_rd, sizeof(dev_rd),HAL_MAX_DELAY);
-   HAL_StatusTypeDef res5 = HAL_SPI_Transmit(&hspi1, dev_addr, sizeof(dev_addr),HAL_MAX_DELAY);
-   HAL_StatusTypeDef res6 = HAL_SPI_Receive(&hspi1, dev_ress, sizeof(dev_ress),HAL_MAX_DELAY);
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-
-   if((res1 != HAL_OK) || (res2 != HAL_OK) || (res3 != HAL_OK) || (res4 != HAL_OK) || (res5 != HAL_OK) || (res6 != HAL_OK)) {
-	   ssd1306_SetCursor(40,40);
-	   ssd1306_WriteString(dev_ress, Font_7x10, White);
-	   ssd1306_SetCursor(10,10);
-	   ssd1306_WriteString("WRONG", Font_7x10, White);
-	      ssd1306_UpdateScreen();
-   }
-   else
-   {
-	   ssd1306_SetCursor(10,10);
-	   ssd1306_WriteString("OK", Font_7x10, White);
-	   ssd1306_SetCursor(40,40);
-	   ssd1306_WriteString(dev_ress, Font_7x10, White);
-	   	      ssd1306_UpdateScreen();
-   }*/
-  /// HAL_StatusTypeDef res1, res2;
-  // uint8_t devid_cmd[1] = { 0x9F };
-   //uint8_t devid_res[5];
-   //printf("Text\n\r");
-
-/*
-
-   FLASH->KEYR = FLASH_KEY1;
-      FLASH->KEYR = FLASH_KEY2;
+    //char* wmsgg="Dubinich        Password        habr.ru         105             ";
+    char outpttt[64]="";
+    writeToEeprom(memoryAddres, out,64);
+    //structToMemory(&tst,memoryAddres);
+    //ssd1306_UpdateScreen();
+    readFromEeprom(memoryAddres,outpttt,64);
+    HAL_Delay(100);
+    CDC_Transmit_FS(outpttt, 64);
+      HAL_Delay(1000);
+    //memoryToStruct(&tst,memoryAddres);
+    HAL_Delay(100);
 
 
+   ssd1306_Fill(Black);
+   ssd1306_UpdateScreen();
+   HAL_Delay(300);
+   ssd1306_SetCursor(0,10);
+   ssd1306_WriteString("test", Font_7x10, White);
+  // ssd1306_SetCursor(0,20);
+   //ssd1306_WriteString(out, Font_7x10, White);
+   //ssd1306_SetCursor(0,30);
+   //ssd1306_WriteString(tst.url, Font_7x10, White);
+   //ssd1306_SetCursor(0,40);
+   //ssd1306_WriteString(tst.number, Font_7x10, White);
+   //HAL_Delay(300);
 
-      FLASH->ACR |= FLASH_ACR_LATENCY_5WS;
-
-         FLASH->SR = 0xFFFFFFFF;
-         FLASH->CR |= FLASH_CR_SER;
-         FLASH->CR |= FLASH_CR_PSIZE_1; //2.7 - 3.6 V 0x10
-         //FLASH->CR |= ((uint32_t)11 << FLASH_CR_SNB_Pos);
-         FLASH->CR |=  FLASH_CR_SNB_1; //0x1011
-
-         FLASH->CR |= FLASH_CR_STRT;
-         while((FLASH->SR & FLASH_SR_BSY) == 1){};
-
-         FLASH->CR = 0x80000000;
-
-      while (FLASH->SR & FLASH_SR_BSY);
-      FLASH->CR |= FLASH_CR_PG; //Разрешаем программирование флеша
-      while (FLASH->SR & FLASH_SR_BSY);
-      uint32_t addres=0x08000000;
-      uint32_t data="test";
-       *(__IO uint32_t*)addres = (uint32_t)data;
-       while (FLASH->SR & FLASH_SR_BSY);
-       FLASH->CR &= ~(FLASH_CR_PG); //Запрещаем программирование флеша
-       FLASH->CR = 0x80000000;
-*/
-
-      // ssd1306_Fill(White);
-       //ssd1306_UpdateScreen();
-
-/*
-   FLASH->KEYR = FLASH_KEY1;
-   FLASH->KEYR = FLASH_KEY2;
-
-   FLASH->ACR |= FLASH_ACR_LATENCY_5WS;
-
-   //FLASH->SR = 0xFFFFFFFF;
-   FLASH->CR |= FLASH_CR_SER;
-   FLASH->CR |= FLASH_CR_PSIZE_1; //2.7 - 3.6 V 0x10
-   //FLASH->CR |= ((uint32_t)11 << FLASH_CR_SNB_Pos);
-   FLASH->CR |= FLASH_CR_SNB_0; //0x1011
-
-   FLASH->CR |= FLASH_CR_STRT;
-   while((FLASH->SR & FLASH_SR_BSY) == 1){};
-
-   FLASH->CR = 0x80000000;
-*/
+   ssd1306_UpdateScreen();
 
 
+   //HAL_Delay(10);
+   //CDC_Transmit_FS(tst.login, sizeof(tst.login));
+   //HAL_Delay(10);
+   //CDC_Transmit_FS(tst.password, sizeof(tst.password));
+   //HAL_Delay(10);
+   //CDC_Transmit_FS(tst.url, sizeof(tst.url));
+   //HAL_Delay(10);
+   CDC_Transmit_FS(out, 64);
+   HAL_Delay(1000);
+
+   */
+
+
+   /*
+   HAL_Delay(100);
+   CDC_Transmit_FS(wmsg, sizeof(wmsg));
+   HAL_Delay(100);
+   CDC_Transmit_FS("|", sizeof("|"));
+   hcryp.Init.pKey = (uint32_t *)"test5";
+        HAL_CRYP_Init(&hcryp);
+        while(HAL_CRYP_GetState(&hcryp)!= HAL_CRYP_STATE_READY){}
+        HAL_CRYP_Encrypt(&hcryp, (uint8_t*)wmsg, sizeof(wmsg),outp, 10);
+        while(HAL_CRYP_GetState(&hcryp)!= HAL_CRYP_STATE_READY){}
+       // HAL_CRYP_DeInit(&hcryp);
+        HAL_Delay(100);
+        CDC_Transmit_FS(outp, sizeof(outp));
+        HAL_Delay(100);
+        CDC_Transmit_FS("|", sizeof("|"));
+        //HAL_CRYP_Init(&hcryp);
+        while(HAL_CRYP_GetState(&hcryp)!= HAL_CRYP_STATE_READY){}
+        HAL_CRYP_Decrypt(&hcryp, (uint8_t*)outp, sizeof(wmsg),	outpt, 10);
+        while(HAL_CRYP_GetState(&hcryp)!= HAL_CRYP_STATE_READY){}
+       // HAL_CRYP_DeInit(&hcryp);
+        CDC_Transmit_FS(outpt, sizeof(outpt));
+        HAL_Delay(100);
+        CDC_Transmit_FS("|", sizeof("|"));
+
+        ssd1306_SetCursor(0,40);
+        ssd1306_WriteString(outpt, Font_7x10, White);
+        HAL_Delay(300);
+   ssd1306_UpdateScreen();*/
+   //DES_ECB_Encrypt_Init();
+
+   HAL_Delay(3000);
+   initConstants();
+   initMenu();
+   HAL_Delay(3000);
+   char inpt[64]="krakozabe       qwertyuii       4pda.ru         105             ";
+      addDataBlock(inpt);
+      HAL_Delay(3000);
+      sendAllData();
+   //updateScreen();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -266,8 +283,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_Delay(1000);
-	     CDC_Transmit_FS(wmsg, sizeof(wmsg));
+
+    HAL_Delay(1000);
+    if(dataReciveBufer!=0)
+    {
+    	//if(dataReciveBufer[])
+    	CDC_Transmit_FS(dataReciveBufer, sizeof(dataReciveBufer));
+    	for(uint32_t i=0;i<usbBuferSize;i++)
+    	{
+    		  dataReciveBufer[i]=0;
+    	}
+    }
+
+
+   // CDC_Transmit_FS(wmsg, sizeof(wmsg));
   }
   /* USER CODE END 3 */
 }
@@ -301,7 +330,7 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
@@ -345,7 +374,7 @@ static void MX_CRYP_Init(void)
 {
 
   /* USER CODE BEGIN CRYP_Init 0 */
-
+	hcryp.Init.pKey = "test";
   /* USER CODE END CRYP_Init 0 */
 
   /* USER CODE BEGIN CRYP_Init 1 */
@@ -453,21 +482,159 @@ static void MX_RNG_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 24000;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 10;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pins : PC8 PC9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin== GPIO_PIN_8&&!leftButtonStatus) {
+		HAL_TIM_Base_Stop(&htim6);
+		tim6_counter=0;
+		leftButtonStatus=1;
+		HAL_TIM_Base_Start(&htim6);
+		HAL_TIM_Base_Start_IT(&htim6);
+	}
+	if(GPIO_Pin== GPIO_PIN_9&&!rightButtonStatus) {
+		HAL_TIM_Base_Stop(&htim6);
+		tim6_counter=0;
+		rightButtonStatus=1;
+		HAL_TIM_Base_Start(&htim6);
+		HAL_TIM_Base_Start_IT(&htim6);
+    }
+	if(rightButtonStatus&&leftButtonStatus)
+	{
+		bothButtonStatus=1;
+	}
+}
+
+void leftButtonActions()
+{
+	ssd1306_SetCursor(10,0);
+	ssd1306_WriteString("L", Font_7x10, White);
+	ssd1306_UpdateScreen();
+	menu.pointer--;
+	updateScreen();
+}
+
+void rightButtonActions()
+{
+	ssd1306_SetCursor(24,0);
+	ssd1306_WriteString("R", Font_7x10, White);
+	ssd1306_UpdateScreen();
+	menu.pointer++;
+    updateScreen();
+	//endDataPointer++;
+}
+
+void bothButtonActions()
+{
+	ssd1306_SetCursor(17,0);
+	ssd1306_WriteString("B", Font_7x10, White);
+	ssd1306_UpdateScreen();
+	//updateScreen();
+}
+
+
+
+void setInitStatus(uint8_t status)
+{
+
+}
+
+void setPublicKey(char* status)
+{
+
+}
+
+void setPrivateKey(char* status)
+{
+
+}
+
+void setEmail(char* status)
+{
+
+}
+
+void setNumber(uint16_t status)
+{
+
+}
+
+void setPcId(uint16_t status)
+{
+
+}
+void setPassword (uint16_t status)
+{
+
+}
+
+
+
+
 
 /* USER CODE END 4 */
 

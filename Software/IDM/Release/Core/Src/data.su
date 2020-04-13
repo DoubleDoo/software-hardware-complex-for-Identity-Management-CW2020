@@ -1,0 +1,10 @@
+data.c:7:6:initConstants	0	static
+data.c:81:6:stringToStruct	12	static
+data.c:89:6:structToString	12	static
+data.c:97:6:visualizeStruct	16	static
+data.c:58:6:updateScreen	8	static
+data.c:111:6:writeToEeprom	32	static
+data.c:125:6:readFromEeprom	32	static
+data.c:12:6:sendAllData	88	static
+data.c:27:6:addDataBlock	104	dynamic
+data.c:44:6:initMenu	120	dynamic

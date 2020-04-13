@@ -32,7 +32,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "ssd1306.h"
+#include "fonts.h"
+#include "stm32f2xx_it.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -42,7 +44,16 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+#define usbBuferSize 128
+#define usbBlockSize 64
+_Bool leftButtonStatus;
+_Bool rightButtonStatus;
+_Bool bothButtonStatus;
+_Bool isUSBBusy;
 
+uint8_t dataReciveBufer[usbBuferSize];
+//uint16_t startDataPointer;
+//uint16_t endDataPointer;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -54,7 +65,13 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+void leftButtonActions(void);
 
+void rightButtonActions(void);
+
+void bothButtonActions(void);
+
+void printCounter(uint16_t i);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

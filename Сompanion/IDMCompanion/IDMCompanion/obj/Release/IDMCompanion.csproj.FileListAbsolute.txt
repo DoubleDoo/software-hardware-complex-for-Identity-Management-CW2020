@@ -1,0 +1,14 @@
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\bin\Release\IDMCompanion.exe.config
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\bin\Release\IDMCompanion.exe
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\bin\Release\IDMCompanion.pdb
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.csprojAssemblyReference.cache
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\MainWindow.g.cs
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\App.g.cs
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion_MarkupCompile.cache
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion_MarkupCompile.lref
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\MainWindow.baml
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.g.resources
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.Properties.Resources.resources
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.csproj.GenerateResource.cache
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.exe
+D:\GIT\software-hardware-complex-for-Identity-Management\Сompanion\IDMCompanion\IDMCompanion\obj\Release\IDMCompanion.pdb

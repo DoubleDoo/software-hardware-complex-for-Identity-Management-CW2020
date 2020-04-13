@@ -1,5 +1,7 @@
+"Core/Src/data.o"
 "Core/Src/fonts.o"
 "Core/Src/main.o"
+"Core/Src/menu.o"
 "Core/Src/ssd1306.o"
 "Core/Src/stm32f2xx_hal_msp.o"
 "Core/Src/stm32f2xx_it.o"

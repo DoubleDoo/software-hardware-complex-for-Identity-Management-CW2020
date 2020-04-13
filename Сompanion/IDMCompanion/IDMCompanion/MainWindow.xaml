@@ -1,0 +1,28 @@
+﻿<Window x:Class="IDMCompanion.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IDMCompanion"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="47*"/>
+            <ColumnDefinition Width="41*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="dataBox" HorizontalAlignment="Left" Margin="236,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="399" Width="546" Grid.ColumnSpan="2"/>
+        <Button x:Name="testButton" Content="Подключиться к устройству" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="183" Height="32" Click="Button_Click"/>
+        <Button Content="Отправить тестовую команду" HorizontalAlignment="Left" Margin="10,125,0,0" VerticalAlignment="Top" Width="183" Height="32" Click="Button_Click_1"/>
+        <Button Content="Начать процес инициализации" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" Width="183" Height="35" Click="Button_Click_2"/>
+        <Button Content="Сбросить устройство" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_4"/>
+        <Button Content="Отправить команду" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_5"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,200,0,0" TextWrapping="Wrap" Text="Команда" VerticalAlignment="Top" Width="183"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,228,0,0" TextWrapping="Wrap" Text="Данные" VerticalAlignment="Top" Width="183"/>
+        <Button Content="Запросить данные" HorizontalAlignment="Left" Margin="10,256,0,0" VerticalAlignment="Top" Width="183" Height="36" Click="Button_Click_3"/>
+        <Button Content="Запросить данные для" HorizontalAlignment="Left" Margin="10,297,0,0" VerticalAlignment="Top" Width="183" Height="36" Click="Button_Click_6"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,338,0,0" TextWrapping="Wrap" Text="Домен сервиса" VerticalAlignment="Top" Width="183"/>
+        <Button Content="Отчистить поле" HorizontalAlignment="Left" Margin="10,366,0,0" VerticalAlignment="Top" Width="183" Height="28" Click="Button_Click_7"/>
+
+    </Grid>
+</Window>

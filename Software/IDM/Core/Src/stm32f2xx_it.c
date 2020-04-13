@@ -57,8 +57,10 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+extern TIM_HandleTypeDef htim6;
 /* USER CODE BEGIN EV */
-
+uint16_t tim6_counter;
+//_Bool timerend=0;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -196,6 +198,61 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f2xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+
+  /* USER CODE END EXTI9_5_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
+
+  /* USER CODE END EXTI9_5_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
+  */
+void TIM6_DAC_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+
+  /* USER CODE END TIM6_DAC_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim6);
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+  if(tim6_counter<2)
+  {
+	  tim6_counter++;
+	 // printCounter((char)tim6_counter);
+  }
+  else
+  {
+	  //_Bool leftButtonStatus;
+	  //_Bool rightButtonStatus;
+	  //_Bool bothButtonStatus;
+	  HAL_TIM_Base_Stop(&htim6);
+	  tim6_counter=0;
+	  if(bothButtonStatus)
+	  {
+		 bothButtonActions();
+	  }
+	  else if (leftButtonStatus)
+	  {
+		 leftButtonActions();
+	  } else if (rightButtonStatus)
+	  {
+		 rightButtonActions();
+	  }
+	  leftButtonStatus=0;
+	  rightButtonStatus=0;
+	  bothButtonStatus=0;
+  }
+  /* USER CODE END TIM6_DAC_IRQn 1 */
+}
 
 /**
   * @brief This function handles USB On The Go FS global interrupt.
