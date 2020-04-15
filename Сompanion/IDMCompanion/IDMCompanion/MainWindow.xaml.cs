@@ -129,7 +129,14 @@ namespace IDMCompanion
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
-
+            string inn=comandBox.Text;
+            string buf = "";
+            for (int i=1;i<=inn.Length/5;i++)
+            {
+                buf = buf+"\"" + inn.Substring((i-1)*5, 5) + "\",";
+                if (i % 10 == 0) buf += "\n";
+            }
+            inndataBox.Text=buf;
         }
 
         private void Button_Click_7(object sender, RoutedEventArgs e)

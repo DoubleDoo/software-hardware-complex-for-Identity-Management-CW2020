@@ -204,3 +204,96 @@ void ssd1306_SetCursor(uint8_t x, uint8_t y)
 	SSD1306.CurrentX = x;
 	SSD1306.CurrentY = y;
 }
+
+
+void ssd1306_Clear_Bufer_part(int x,int y,int width,int height)
+	{
+	for(int j=0;j<height;j++)
+			{
+				for(int i=0;i<width;i++)
+				{
+
+					ssd1306_DrawPixel(x+i, y+j, Black);
+				}
+			}
+	}
+
+	void ssd1306_Write_To_Bufer(int x,int y,int width,int height,const uint8_t* img)
+	{
+		for(int j=0;j<height;j++)
+		{
+			for(int i=0;i<width;i++)
+			{
+				if(((img[j*width/8+(i/8)]>>(7-i%8))&0b00000001)==1)
+				ssd1306_DrawPixel(x+i, y+j, White);
+				else ssd1306_DrawPixel(x+i, y+j, Black);
+			}
+		}
+	}
+
+
+
+	void ssd1306_WriteStringUint(uint16_t inn, FontDef Font, SSD1306_COLOR color)
+	{
+		if(inn==0)
+		{
+				ssd1306_WriteString("0", Font,color);
+
+		}else{
+		uint16_t count=0;
+		uint16_t dev=1;
+		uint16_t num=0;
+		while(inn/dev!=0)
+		{
+			count++;
+			dev*=10;
+		}
+		//count++;
+		//dev=1000;
+
+		dev=dev/10;
+
+		for(uint16_t i=0;i<count;i++)
+		{
+			num=inn/dev;
+			inn=inn%dev;
+			dev=dev/10;
+			switch(num)
+			{
+			case 1:
+				ssd1306_WriteString("1", Font,color);
+				break;
+			case 2:
+				ssd1306_WriteString("2", Font,color);
+						break;
+			case 3:
+				ssd1306_WriteString("3", Font,color);
+						break;
+			case 4:
+				ssd1306_WriteString("4", Font,color);
+						break;
+			case 5:
+				ssd1306_WriteString("5", Font,color);
+						break;
+			case 6:
+				ssd1306_WriteString("6", Font,color);
+						break;
+			case 7:
+				ssd1306_WriteString("7", Font,color);
+						break;
+			case 8:
+				ssd1306_WriteString("8", Font,color);
+						break;
+			case 9:
+				ssd1306_WriteString("9", Font,color);
+						break;
+			case 0:
+							ssd1306_WriteString("0", Font,color);
+									break;
+			}
+
+		}
+		}
+	}
+
+

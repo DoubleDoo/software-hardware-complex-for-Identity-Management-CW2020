@@ -24,12 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ssd1306.h"
-#include "fonts.h"
 #include "data.h"
-#include "stm32f2xx_it.h"
-//#include "stdbool.h"
-//#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -51,6 +46,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
 CRC_HandleTypeDef hcrc;
 
 CRYP_HandleTypeDef hcryp;
@@ -66,6 +62,64 @@ RNG_HandleTypeDef hrng;
 TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
+
+
+uint16_t dictionarySeze=500;
+char* wordsForPassFrase[] ={
+		"aiken","durga","essen","evers","haiti","horus","issus","kamet","klimt","laius",
+		"locke","lorre","lowry","mamet","marti","medea","niger","oates","potos","quito",
+		"senor","turin","ushas","wells","aboil","acari","acoma","actin","adage","adeem",
+		"adfix","adion","afore","agasp","aglet","alans","albin","algic","alody","amide",
+		"ample","ancon","anker","annat","annie","anous","aoife","aotes","argil","aries",
+		"arkab","arneb","artal","arvel","arzan","astay","atter","avoid","awash","axion",
+		"axoid","ayond","bache","bahay","bajra","balai","baloo","bando","barbe","bayal",
+		"beamy","becut","bedad","beget","belga","bemad","benne","betta","bezel","birle",
+		"blast","blimp","bloat","bocal","bodge","bonny","boose","boral","bortz","bosom",
+		"brass","bring","broll","buddy","bully","bushy","butch","cajun","canna","canoe",
+		"carol","carse","carya","cased","casse","catti","celom","chaya","cheve","chips",
+		"choel","claim","clary","claut","clava","cleek","cloot","clove","clump","coapt",
+		"cobia","cobus","cogue","colla","comma","copsy","corps","covet","crash","cress",
+		"creta","crete","croci","daffy","dafla","darer","deign","denda","dewey","diner",
+		"dinus","disco","dixit","dizzy","domal","douar","dover","dreng","dropt","drown",
+		"drunk","dural","dusun","easer","echis","elmer","elops","elute","elves","embed",
+		"emcee","emmer","envoy","erian","erick","erose","erupt","every","exdie","fanon",
+		"fanti","fanwe","fatal","favus","fedia","feint","fesse","fiard","finer","fiver",
+		"flame","flare","flary","fleam","fleet","flesh","flong","foaly","fogle","forth",
+		"fosse","found","freed","freit","fresh","fritt","frizz","fubsy","futon","gaine",
+		"ganch","gatch","genin","genus","gipon","gippy","given","glaik","gland","glazy",
+		"gledy","gloom","goban","golee","gorra","gourd","gouty","grail","grebo","gripy",
+		"gugal","gypsy","habit","halse","harpa","herne","hevea","hocky","howso","humph",
+		"ictic","iddat","idose","illth","imber","infer","inlaw","innet","input","irfan",
+		"irone","itchy","jaman","jamie","jenny","jural","kafiz","kanji","kapai","kappe",
+		"keleh","kench","khaya","khoja","kissy","klosh","known","kodro","kokio","krems",
+		"lacer","lacet","lairy","lammy","larch","large","lever","ligas","lived","lobed",
+		"loner","lotta","louey","lowth","lucan","luigi","lyard","maggy","mahdi","maidy",
+		"mamma","manei","mapau","masty","mayan","mease","merak","merop","metal","metol",
+		"miaul","mikie","minty","misty","moity","mossy","mourn","moyen","muffy","namda",
+		"nanes","nanga","nasch","nasty","navar","nayar","nazir","nigre","niqab","niter",
+		"norie","nunni","nuque","nyxis","oasal","oasis","ohmic","onymy","otary","oxbow",
+		"oxlip","pacer","padre","padus","palar","palpi","parra","parse","parts","pasmo",
+		"patly","peasy","peaty","pedal","peggy","pekan","penta","pesky","phase","pinko",
+		"pinky","pinny","plaga","plaid","plica","plyer","pokom","pommy","poria","prase",
+		"pudic","puppy","quart","quoit","raggy","raker","raman","raphe","rapic","rebid",
+		"rebus","refan","renet","repew","resay","rewed","richt","rinse","rohob","rondo",
+		"royal","runed","ryder","sabra","salma","samen","sanai","sandy","savor","schwa",
+		"sclaw","scope","scout","scrim","segno","senci","septi","seral","sereh","serum",
+		"seven","shahi","shiko","shire","shive","shoya","sided","sidth","sigeh","simar",
+		"sinew","sirih","skank","skill","slent","slive","snafu","snake","sneap","spale",
+		"spang","spece","sprig","squab","steri","stilt","stoff","stong","stosh","strag",
+		"stree","strow","stunk","sturt","suant","suety","surfy","swile","swoop","tahil",
+		"taich","taler","tangi","tanti","tanzy","taraf","techy","tellt","tenty","terce",
+		"terse","tetum","thatn","thawy","thymy","tilde","titar","tizzy","toity","toned",
+		"tongs","torah","torma","trill","trixy","trope","truck","tryst","tufty","tumor",
+		"turco","uinal","unhad","unhid","unket","upend","urare","ureic","utick","vagas",
+		"valve","vealy","vepse","vibex","vicar","virtu","volet","volva","vuggy","wabby",
+		"walth","waltz","wamus","wawah","weaky","wendy","whalp","wheen","while","wined",
+		"wings","wisse","words","wrack","wrive","xylon","yummy","zanze","ziega","zonta"
+};
+
+
+
 
 /* USER CODE END PV */
 
@@ -134,7 +188,10 @@ int main(void)
    ssd1306_Fill(White);
    ssd1306_UpdateScreen();
    ssd1306_Fill(Black);
+   generateRandomNumbers(12,0xf);
    ssd1306_UpdateScreen();
+   HAL_Delay(10000);
+
    //пример записи в память
 
 
@@ -265,14 +322,24 @@ int main(void)
    ssd1306_UpdateScreen();*/
    //DES_ECB_Encrypt_Init();
 
-   HAL_Delay(3000);
+
+
+   /*
+   HAL_Delay(1000);
    initConstants();
    initMenu();
-   HAL_Delay(3000);
+   HAL_Delay(1000);
    char inpt[64]="krakozabe       qwertyuii       4pda.ru         105             ";
-      addDataBlock(inpt);
-      HAL_Delay(3000);
-      sendAllData();
+   addDataBlock(inpt);
+   HAL_Delay(1000);
+   sendAllData();*/
+   initConstants();
+   initChoseProcess();
+
+   //generatePassFrase();
+
+
+
    //updateScreen();
   /* USER CODE END 2 */
 
@@ -283,7 +350,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+/*
     HAL_Delay(1000);
     if(dataReciveBufer!=0)
     {
@@ -294,7 +361,7 @@ int main(void)
     		  dataReciveBufer[i]=0;
     	}
     }
-
+*/
 
    // CDC_Transmit_FS(wmsg, sizeof(wmsg));
   }
@@ -574,8 +641,47 @@ void leftButtonActions()
 	ssd1306_SetCursor(10,0);
 	ssd1306_WriteString("L", Font_7x10, White);
 	ssd1306_UpdateScreen();
-	menu.pointer--;
-	updateScreen();
+	if(menuStatus==1)
+	{
+		menu.pointer--;
+		updateScreen();
+	}
+	if(initStatus==1)
+	{
+		initProcess1();
+
+	}
+	if(initStatusStep1==1){
+		//initProcess1Next();
+	}
+	if(initStatusStep2==1){
+		initStatus=1;
+		initStatusStep2=0;
+		initProcess1();
+	}else if(setPasswordStep1==1){
+		setPasswordProcess1Down();
+	}
+	else if(setPasswordStep2==1){
+			setPasswordProcess1Down();
+		}
+	else if(restoreStatusStep1==1)
+		{
+		initStatus=1;
+				restoreStatusStep1=0;
+			initChoseProcess();
+		}else if(setProtectTypeStep1==1)
+		{
+			setProtectTypeProcess1Down();
+		}
+		else if(settingsMenuStatus==1)
+			{
+			settingsMenuDown();
+			}
+		else if(dataControlMenuStatus==1)
+				{
+			dataControlMenuDown();
+				}
+
 }
 
 void rightButtonActions()
@@ -583,8 +689,44 @@ void rightButtonActions()
 	ssd1306_SetCursor(24,0);
 	ssd1306_WriteString("R", Font_7x10, White);
 	ssd1306_UpdateScreen();
-	menu.pointer++;
-    updateScreen();
+	if(menuStatus==1)
+	{
+		menu.pointer++;
+		updateScreen();
+	}
+	else if(initStatus==1)
+	{
+		restoreProcess1();
+	}
+	else if(initStatusStep1==1){
+		//initProcess1Next();
+	}
+	else if(initStatusStep2==1){
+			initProcess2Next();
+	}else if(setPasswordStep1==1){
+		setPasswordProcess1Up();
+	}else if(setPasswordStep2==1){
+		setPasswordProcess1Up();
+	}
+	else if(restoreStatusStep1==1)
+		{
+		initStatus=1;
+				restoreStatusStep1=0;
+			initChoseProcess();
+		}else if(setProtectTypeStep1==1)
+		{
+			setProtectTypeProcess1Up();
+		}
+		else if(settingsMenuStatus==1)
+			{
+			 settingsMenuUp();
+			}
+		else if(dataControlMenuStatus==1)
+				{
+			dataControlMenuUp();
+				}
+
+
 	//endDataPointer++;
 }
 
@@ -593,46 +735,123 @@ void bothButtonActions()
 	ssd1306_SetCursor(17,0);
 	ssd1306_WriteString("B", Font_7x10, White);
 	ssd1306_UpdateScreen();
-	//updateScreen();
+	//initProcess1();
+	if(menuStatus==1)
+	{
+		chooseMainMenu();
+	}
+	else if(initStatus==1){
+		//initProcess1();
+    }
+	else if(initStatusStep1==1){
+		initProcess1Next();
+	}
+	else if(setPasswordStep1==1){
+		setPasswordProcess1Next();
+	}
+	else if(setPasswordStep2==1){
+			setPasswordProcess2Next();
+		}
+	else if(restoreStatusStep1==1)
+	{
+		initStatus=1;
+		restoreStatusStep1=0;
+		initChoseProcess();
+	}
+	else if(setProtectTypeStep1==1)
+	{
+		setProtectTypeProcess1Next();
+	}
+	else if(settingsMenuStatus==1)
+	{
+		settingsMenuSelect();
+	}
+	else if(dataControlMenuStatus==1)
+		{
+		dataControlMenuSelect();
+		}
+	//updateScreen();dataControlMenuStatus
 }
 
 
 
-void setInitStatus(uint8_t status)
+void generatePassFrase()
 {
+	uint16_t num;
+	generateRandomNumbers(500,0xfff);
+	      for(int i=0;i<12;i++)
+	      {
+	    	  passFrase[i]=wordsForPassFrase[RNGNumbers[i]];
+	      }
 
+	      for(int i=0;i<12;i++)
+	      {
+	    	  CDC_Transmit_FS(passFrase[i], 5);
+	    	  HAL_Delay(10);
+	    	  CDC_Transmit_FS(" ", sizeof(" "));
+	    	  HAL_Delay(10);
+	      }
 }
 
-void setPublicKey(char* status)
+void generateRandomNumbers(uint16_t blocknumber,uint16_t filter)
 {
+	/*
+	uint16_t dev=10;
+	uint16_t count=1;
 
+	while(blocknumber/dev>0)
+	{
+		dev=dev*10;
+		count++;
+	}*/
+	_Bool isOk=0;
+	for(uint16_t i=0;i<12;i++)
+		{
+		    RNGNumbers[i]=HAL_RNG_GetRandomNumber(&hrng)&filter;
+		    //isOk=0;
+		    while((RNGNumbers[i]>=blocknumber))
+		    {
+		    	RNGNumbers[i]=HAL_RNG_GetRandomNumber(&hrng)&filter;
+		    	/*for(uint16_t j=0;j<i;j++)
+		    	{
+		    		if (RNGNumbers[i]==RNGNumbers[j])
+		    		{
+		    			isOk=0;
+		    		}
+		    		else
+		    		{
+		    			isOk=1;
+		    		}
+
+		    	}*/
+		    }
+
+	}
+	for(uint16_t i=0;i<12;i++)
+	{
+		for(uint16_t j=0;j<i;j++)
+		{
+			while(RNGNumbers[i]==RNGNumbers[j]||(RNGNumbers[i]>=blocknumber))
+			{
+				RNGNumbers[i]=HAL_RNG_GetRandomNumber(&hrng)&filter;
+			}
+		}
+	}
+
+	for(uint16_t i=0;i<6;i++)
+		{
+		ssd1306_SetCursor(2,10+i*10);
+		ssd1306_WriteStringUint(RNGNumbers[i], Font_7x10, White);
+		ssd1306_SetCursor(72,10+i*10);
+		ssd1306_WriteStringUint(RNGNumbers[i+6], Font_7x10, White);
+	    }
+	ssd1306_SetCursor(2,0);
+	ssd1306_WriteStringUint(filter, Font_7x10, White);
+	/*
+
+	RNG[0]=HAL_RNG_GetRandomNumber(&hrng)&0x000001FF;*/
+	//RNGNumbers[12];
 }
-
-void setPrivateKey(char* status)
-{
-
-}
-
-void setEmail(char* status)
-{
-
-}
-
-void setNumber(uint16_t status)
-{
-
-}
-
-void setPcId(uint16_t status)
-{
-
-}
-void setPassword (uint16_t status)
-{
-
-}
-
-
 
 
 

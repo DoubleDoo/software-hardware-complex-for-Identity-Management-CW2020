@@ -6,3 +6,6 @@ ssd1306.c:110:6:ssd1306_DrawPixel	12	static
 ssd1306.c:141:6:ssd1306_WriteChar	64	static
 ssd1306.c:180:6:ssd1306_WriteString	32	static
 ssd1306.c:202:6:ssd1306_SetCursor	0	static
+ssd1306.c:209:6:ssd1306_Clear_Bufer_part	32	static
+ssd1306.c:221:7:ssd1306_Write_To_Bufer	48	static
+ssd1306.c:236:7:ssd1306_WriteStringUint	48	static

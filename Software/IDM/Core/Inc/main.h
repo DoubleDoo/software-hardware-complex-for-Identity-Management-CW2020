@@ -50,10 +50,38 @@ _Bool leftButtonStatus;
 _Bool rightButtonStatus;
 _Bool bothButtonStatus;
 _Bool isUSBBusy;
+char* passFrase[12];
 
+uint16_t* isInit;
+uint16_t* initStatus;
+uint16_t* initStatusStep1;
+uint16_t* initStatusStep2;
+uint16_t* restoreStatusStep1;
+uint16_t* restoreStatusStep2;
+
+uint16_t* setPasswordStep1;
+uint16_t* setPasswordStep2;
+
+uint16_t* ProtectType;
+uint16_t* setProtectTypeStep1;
+uint16_t* setProtectTypeStep2;
+
+uint16_t* settingsMenuStatus;
+
+uint16_t* dataControlMenuStatus;
+
+uint16_t* menuStatus;
+uint16_t* restoreStatus;
+uint16_t* setPasswordStatus;
+uint16_t* settingsStatus;
+uint16_t* datasettingsStatus;
 uint8_t dataReciveBufer[usbBuferSize];
+
+uint16_t RNGNumbers[12];
+
 //uint16_t startDataPointer;
 //uint16_t endDataPointer;
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -70,6 +98,9 @@ void leftButtonActions(void);
 void rightButtonActions(void);
 
 void bothButtonActions(void);
+void generatePassFrase(void);
+void generateRandomNumbers(uint16_t blocknumber,uint16_t filter);
+
 
 void printCounter(uint16_t i);
 /* USER CODE END EFP */

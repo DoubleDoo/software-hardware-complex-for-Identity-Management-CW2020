@@ -1,6 +1,6 @@
 
 #include "main.h"
-
+//#include "stm32f2xx_hal.h"
 
 #define usbBlockSize 64
 
@@ -31,6 +31,11 @@ typedef struct {
 
 menuAB menu;
 constants sconstants;
+int16_t  pointer;
+int16_t  updownpointer;
+uint16_t  password[6];
+uint16_t  imputpassword[6];
+
 
 
 

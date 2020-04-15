@@ -37,7 +37,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../USB_DEVICE/App/usb_device.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
  ../USB_DEVICE/Target/usbd_conf.h ../Core/Inc/ssd1306.h \
- ../Core/Inc/fonts.h ../Core/Inc/stm32f2xx_it.h
+ ../Core/Inc/fonts.h ../Core/Inc/data.h ../Core/Inc/main.h \
+ ../Core/Inc/stm32f2xx_it.h
 
 ../Core/Inc/main.h:
 
@@ -124,5 +125,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/ssd1306.h:
 
 ../Core/Inc/fonts.h:
+
+../Core/Inc/data.h:
+
+../Core/Inc/main.h:
 
 ../Core/Inc/stm32f2xx_it.h:
