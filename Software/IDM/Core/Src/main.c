@@ -182,7 +182,7 @@ int main(void)
    ssd1306_Fill(White);
    ssd1306_UpdateScreen();
    ssd1306_Fill(Black);
-
+   //generateExtraData();
 
    initConstants();
    ssd1306_SetCursor(20,20);
@@ -418,7 +418,7 @@ int main(void)
 
    //updateScreen();
 
-
+   char bufff[64]="";
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -457,19 +457,55 @@ int main(void)
     	//добавить идент. данные
     	if(dataReciveBufer[0]=='N')
     	{
+    		char str[64]="";
+    		for(uint32_t i=2;i<18;i++)
+    		{
+    			str[i-2]=dataReciveBufer[i];
+    		}
+    		for(uint32_t i=18;i<34;i++)
+    		{
+    			str[i-2]=dataReciveBufer[i];
+    		}
+    		for(uint32_t i=32;i<48;i++)
+    		{
+    				str[i]='t';
+    		}
+    		for(uint32_t i=48;i<64;i++)
+    		{
+    		   				str[i]='k';
+    		}
+    		//str[0]=DataCount;
+    		writeToEeprom(0x1000+DataCount*64, str,64);
+    		DataCount++;
+    		uploadDataCount();
+    		accauntBlock blocksbuf [DataCount+1];
+    			 for(uint16_t i=0;i<DataCount;i++)
+    			 {
 
-    		CDC_Transmit_FS("OK", 2);
+    				 readFromEeprom(0x1000+64*i, bufff,64);
+    				 stringToStruct(&bufff, &blocksbuf[i]);
+    			 }
+    			 menu.blocks=blocksbuf;
+    			 sconstants.blockscount=DataCount;
+    		CDC_Transmit_FS(str, 64);
+
+
     	}
     	//импорт
     	if(dataReciveBufer[0]=='I')
     	{
-
     		CDC_Transmit_FS("OK", 2);
+    		if(exportEnable==1){
+    			HAL_Delay(300);
+    			sendAllData();
+    		}
     	}
     	//сброс
     	if(dataReciveBufer[0]=='C')
     	{
-
+    		//clearDevice();
+    		clearDevice();
+    		deviceIsntInit();
     		CDC_Transmit_FS("OK", 2);
     	}
     	//добавить безопасный ПК
@@ -836,7 +872,19 @@ void leftButtonActions()
 				{
 			dataControlMenuDown();
 				}
+		else if (ResetComand==1)
+			{
+			settingsMenuStatus=1;
+			ResetComand=0;
+			settingsMenu();
+			}
+		else if(exportEnable==1)
+		{
+			exportEnable=0;
+			settingsMenuStatus=1;
 
+						settingsMenu();
+		}
 }
 
 void rightButtonActions()
@@ -880,8 +928,20 @@ void rightButtonActions()
 				{
 			dataControlMenuUp();
 				}
+		else if (ResetComand==1)
+			{
+			settingsMenuStatus=0;
+			ResetComand=0;
+			clearDevice();
+			deviceIsntInit();
+			}
+		else if(exportEnable==1)
+		{
+			exportEnable=0;
+			settingsMenuStatus=1;
 
-
+						settingsMenu();
+		}
 	//endDataPointer++;
 }
 
@@ -925,6 +985,17 @@ void bothButtonActions()
 		{
 		dataControlMenuSelect();
 		}
+	else if (ResetComand==1)
+	{
+
+	}
+	else if(exportEnable==1)
+	{
+		exportEnable=0;
+		settingsMenuStatus=1;
+
+					settingsMenu();
+	}
 	//updateScreen();dataControlMenuStatus
 }
 

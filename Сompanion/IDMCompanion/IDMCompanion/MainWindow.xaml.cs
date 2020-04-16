@@ -101,7 +101,7 @@ namespace IDMCompanion
                 //comandBox
                 //inndataBox
                 string comandBoxstr = comandBox.Text;
-                string inndataBoxstr = comandBox.Text;
+                string inndataBoxstr = inndataBox.Text;
                 string data = "";
                 if (comandBoxstr.Length>16 || inndataBoxstr.Length > 16)
                 {

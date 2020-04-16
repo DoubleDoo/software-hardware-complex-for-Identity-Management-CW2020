@@ -7,7 +7,7 @@ startaddressfordata=0x1000;
 
 void deviceIsntInit()
 {
-
+	ssd1306_Fill(Black);
 	ssd1306_SetCursor(2,2);
 	ssd1306_WriteString("Start init from", Font_7x10, White);
 	ssd1306_SetCursor(2,12);
@@ -337,7 +337,7 @@ void initConstants()
 	ProtectType=0;
 	settingsMenuStatus=0;
 	dataControlMenuStatus=0;
-	DataCount=3;
+	DataCount=0;
 	initStatus=0;
 	initStatusStep1=0;
 	initStatusStep2=0;
@@ -497,8 +497,45 @@ void generateExtraData()
 		downloadDataCount();
 
 		//downloadPCIDmas();
-		HAL_Delay(10000);
+		//HAL_Delay(10000);
 }
+
+void clearDevice()
+{
+	isInit=0;
+	ProtectType=0;
+	settingsMenuStatus=0;
+	dataControlMenuStatus=0;
+	DataCount=0;
+	initStatus=0;
+	initStatusStep1=0;
+	initStatusStep2=0;
+	restoreStatusStep1=0;
+	restoreStatusStep2=0;
+	menuStatus=0;
+	restoreStatus=0;
+	setPasswordStatus=0;
+	settingsStatus=0;
+	datasettingsStatus=0;
+	setPasswordStep1=0;
+	setPasswordStep2=0;
+	setProtectTypeStep1=0;
+	setProtectTypeStep2=0;
+	passwordInputStatus=0;
+	leftButtonStatus=0;
+	rightButtonStatus=0;
+	bothButtonStatus=0;
+	M5PCIDdefaultIsGetted=0;
+	uploadIsInit();
+	uploadSecureOpt();
+    uploadPassword();
+	uploadPCIDcount();
+	uploadDataCount();
+	//uploadPCIDmas();
+
+
+}
+
 
 
 
@@ -658,6 +695,19 @@ void  setPasswordProcess2Next()
 		//char* passFrase[12];
 		}
 		else {
+			/*
+			ssd1306_SetCursor(2,50);
+			ssd1306_WriteStringUint(password[0], Font_7x10, White);
+			ssd1306_WriteStringUint(password[1], Font_7x10, White);
+			ssd1306_WriteStringUint(password[2], Font_7x10, White);
+			ssd1306_WriteStringUint(password[3], Font_7x10, White);
+			ssd1306_WriteStringUint(password[4], Font_7x10, White);
+			ssd1306_WriteStringUint(imputpassword[0], Font_7x10, White);
+			ssd1306_WriteStringUint(imputpassword[1], Font_7x10, White);
+			ssd1306_WriteStringUint(imputpassword[2], Font_7x10, White);
+			ssd1306_WriteStringUint(imputpassword[3], Font_7x10, White);
+			ssd1306_WriteStringUint(imputpassword[4], Font_7x10, White);
+			ssd1306_UpdateScreen();*/
 			if(passwordInputStatus==0)
 			{
 			if(imputpassword[0]==password[0]&&imputpassword[1]==password[1]&&imputpassword[2]==password[2]&&imputpassword[3]==password[3]&&imputpassword[4]==password[4])
@@ -682,6 +732,22 @@ void  setPasswordProcess2Next()
 								imputpassword[4]=0;
 							setPasswordProcess1();
 			}
+			}
+			else if(chpassComand==1)
+			{
+
+				if(imputpassword[0]==password[0]&&imputpassword[1]==password[1]&&imputpassword[2]==password[2]&&imputpassword[3]==password[3]&&imputpassword[4]==password[4])
+								{
+					                uploadPassword();
+									setPasswordStep2=0;
+									settingsMenuStatus=1;
+									chpassComand=0;
+									settingsMenu();
+								}
+				else{
+									setPasswordStep2=0;
+									setPasswordProcess1();
+				}
 			}
 			else
 			{
@@ -735,11 +801,24 @@ void setProtectTypeProcess1()
 }
 
 void setProtectTypeProcess1Next(){
-	ProtectType=pointer;
-	generateExtraData();
-	menuStatus=1;
-	setProtectTypeStep1=0;
-	initMenu();
+	if(cProtectComand==1){
+		ProtectType=pointer;
+      uploadSecureOpt();
+//			menuStatus=1;
+			setProtectTypeStep1=0;
+	//		initMenu();
+			settingsMenuStatus=1;
+			cProtectComand=0;
+			settingsMenu();
+	}else
+	{
+		ProtectType=pointer;
+			generateExtraData();
+			menuStatus=1;
+			setProtectTypeStep1=0;
+			initMenu();
+	}
+
 }
 void setProtectTypeProcess1Up(){
 	pointer++;
@@ -1021,7 +1100,7 @@ void settingsMenuSelect()
 								 exportModeMenu();
 										break;
 							case 3:
-								//exportModeMenu();
+								changeProtectionMenu();
 										break;
 							case 4:
 								settingsMenuStatus=0;
@@ -1036,32 +1115,53 @@ void settingsMenuSelect()
 void resetDeviceMenu()
 {
 	settingsMenuStatus=0;
-	menuStatus=1;
-		ssd1306_Fill(Black);
-		ssd1306_SetCursor(2,5);
-		ssd1306_WriteString("Reset device", Font_7x10, White);
-		ssd1306_UpdateScreen();
+	ResetComand=1;
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(2,0);
+	ssd1306_WriteString("Are you shure to ", Font_7x10, White);
+	ssd1306_SetCursor(2,10);
+	ssd1306_WriteString("reset device?", Font_7x10, White);
+	ssd1306_Write_To_Bufer(2,54,8,8,cancel);
+	ssd1306_Write_To_Bufer(120,54,8,8,ok);
+	ssd1306_UpdateScreen();
+
+
+
+}
+
+void changeProtectionMenu()
+{
+	setProtectTypeStep1=1;
+	cProtectComand=1;
+	ssd1306_Fill(Black);
+	setProtectTypeProcess1();
+			ssd1306_UpdateScreen();
+
+
 
 }
 
 void passwordChangeMenu()
 {
 	settingsMenuStatus=0;
-	menuStatus=1;
+	setPasswordStep1=1;
+	chpassComand=1;
 		ssd1306_Fill(Black);
-		ssd1306_SetCursor(2,5);
-		ssd1306_WriteString("Password change", Font_7x10, White);
+		setPasswordProcess1();
 		ssd1306_UpdateScreen();
 }
 
 void exportModeMenu()
 {
 	settingsMenuStatus=0;
-	menuStatus=1;
+	exportEnable=1;
 		ssd1306_Fill(Black);
 		ssd1306_SetCursor(2,5);
 		ssd1306_WriteString("Export mode", Font_7x10, White);
-		ssd1306_UpdateScreen();
+
+		ssd1306_SetCursor(2,40);
+		ssd1306_WriteString("Press any key to return", Font_7x10, White);
+		ssd1306_UpdateScreen();//exportEnable
 }
 
 

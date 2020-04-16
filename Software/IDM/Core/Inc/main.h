@@ -84,7 +84,13 @@ uint16_t* devpreinitmenu;
 
 uint8_t* M5PPCIDCount;
 
-uint8_t* DataCount;
+uint8_t DataCount;
+
+uint8_t* ResetComand;
+uint8_t* chpassComand;
+uint8_t* cProtectComand;
+
+uint8_t* exportEnable;
 
 uint16_t RNGNumbers[12];
 uint8_t* MD5PCID[6];

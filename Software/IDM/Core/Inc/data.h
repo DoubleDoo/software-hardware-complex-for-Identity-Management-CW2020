@@ -36,7 +36,9 @@ int8_t  updownpointer;
 uint8_t  password[6];
 uint8_t  imputpassword[6];
 
+void writeToEeprom(uint16_t memoryAddres, uint8_t* data,uint16_t dataLength);
 
+void readFromEeprom(uint16_t memoryAddres, uint8_t* data,uint16_t dataLength);
 
 
 
