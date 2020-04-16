@@ -18,12 +18,12 @@ typedef struct {
 } menuAB;
 
 typedef struct {
-	uint16_t datacount;
-	uint16_t blockscount;
-	uint16_t startaddressfordata;
-	uint16_t devisescount;
-	uint16_t startaddressfordevices;
-	uint16_t password;
+	uint8_t datacount;
+	uint8_t blockscount;
+	uint8_t startaddressfordata;
+	uint8_t devisescount;
+	uint8_t startaddressfordevices;
+	uint8_t password;
 } constants;
 
 
@@ -31,10 +31,10 @@ typedef struct {
 
 menuAB menu;
 constants sconstants;
-int16_t  pointer;
-int16_t  updownpointer;
-uint16_t  password[6];
-uint16_t  imputpassword[6];
+int8_t  pointer;
+int8_t  updownpointer;
+uint8_t  password[6];
+uint8_t  imputpassword[6];
 
 
 

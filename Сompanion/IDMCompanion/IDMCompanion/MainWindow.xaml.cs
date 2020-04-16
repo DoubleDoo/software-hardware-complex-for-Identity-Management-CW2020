@@ -15,6 +15,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Management;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace IDMCompanion
 {
@@ -24,6 +28,7 @@ namespace IDMCompanion
     public partial class MainWindow : Window
     {
         private bool usbThreadWorking;
+        private string usbbufer;
         private Thread usbThread;
         private SerialPortStream serialPort;
         private int counter = 0;
@@ -34,6 +39,8 @@ namespace IDMCompanion
         }
 
         [STAThread]
+
+        //подключение устройства
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             usbThreadWorking = !usbThreadWorking;
@@ -42,7 +49,6 @@ namespace IDMCompanion
               
                 usbThread = new Thread(new ThreadStart(usbThreadFunk));
                 
-                dataBox.Text += ("Connected" + "\n");
                 usbThread.Start();
             }
            else
@@ -57,16 +63,25 @@ namespace IDMCompanion
         [STAThread]
         private void usbThreadFunk()
         {
-            using (serialPort = new SerialPortStream("COM9"))
+            if (SerialPortStream.GetPortNames().Length > 0)
             {
-                serialPort.OpenDirect();
-
-                while (serialPort.IsOpen)
+                this.Dispatcher.Invoke(() => dataBox.Text += ("Connected" + "\n"));
+                
+                using (serialPort = new SerialPortStream("COM9"))
                 {
-                    char ch = (char)serialPort.ReadChar();
-                    this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ch));
+                    serialPort.OpenDirect();
+
+                    while (serialPort.IsOpen)
+                    {
+                        char ch = (char)serialPort.ReadChar();
+                        this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ch));
+                    }
                 }
             }
+            
+            
+                this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += "Can not connect to device...\n"); usbThreadWorking = false;
+            
         }
 
 
@@ -76,16 +91,30 @@ namespace IDMCompanion
       //      this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ReadChar().ReadExisting() + "\n"));
       //  }
 
+
+
+         //отправка данных
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (usbThreadWorking)
             {
-                //usbThread = new Thread(new ThreadStart(usbThreadFunk));
-
-                //dataBox.Text += ("Connected" + "\n");
-                //usbThread.Start();
-                string data = "(BCDEFGHigklmnopqrstuvwxyz1234567890@!;123456789012345678901234)";
-                // counter++;
+                //comandBox
+                //inndataBox
+                string comandBoxstr = comandBox.Text;
+                string inndataBoxstr = comandBox.Text;
+                string data = "";
+                if (comandBoxstr.Length>16 || inndataBoxstr.Length > 16)
+                {
+                    dataBox.Text += ("Too long domen or login" + "\n");
+                }
+                else
+                {
+                   
+                    while (comandBoxstr.Length < 16) { comandBoxstr += " "; }
+                    while (inndataBoxstr.Length < 16) { inndataBoxstr += " "; }
+                    data = "N " + comandBoxstr + inndataBoxstr;
+                    while (data.Length < 64) { data += " "; }
+                }
                 serialPort.Write(data);
                 dataBox.Text += ("\nОтправлено:" + data+ " \n Получено:");
             }
@@ -94,31 +123,17 @@ namespace IDMCompanion
 
                 dataBox.Text += ("Disconnected, cant send" + "\n");
             }
+            
         }
 
+        //начать инициацию
         private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Click_4(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             if (usbThreadWorking)
             {
-                string data = "(BCDEFGHigklmnopqrstuvwxyz1234567890@!;123456789012345678901234)";
-                // counter++;
+                string data = "P " + GetMD5OFIDs();
                 serialPort.Write(data);
-                dataBox.Text += ("\nОтправлено:" + data + " \n Получено:");
+                dataBox.Text += ("\nОтправлено: " + "Init comand " + " \n Получено:");
             }
             else
             {
@@ -127,21 +142,101 @@ namespace IDMCompanion
             }
         }
 
+        //импорт
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            if (usbThreadWorking)
+            {
+                string data = "I";
+                serialPort.Write(data);
+                dataBox.Text += ("\nОтправлено: " + "Get all data command" + " \n Получено:");
+            }
+            else
+            {
+                dataBox.Text += ("Disconnected, cant send" + "\n");
+            }
+        }
+
+        //сброс устройства
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            if (usbThreadWorking)
+            {
+                string data = "C";
+                serialPort.Write(data);
+                dataBox.Text += ("\nОтправлено: " + "Clear comand " + " \n Получено:");
+            }
+            else
+            {
+                dataBox.Text += ("Disconnected, cant send" + "\n");
+            }
+        }
+
+        //Добавить новый надежный ПК
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            if (usbThreadWorking)
+            {
+                string data = "A";
+                serialPort.Write(data);
+                dataBox.Text += ("\nОтправлено: " + "Add safe PC comand " + " \n Получено:");
+            }
+            else
+            {
+                dataBox.Text += ("Disconnected, cant send" + "\n");
+            }
+        }
+        
+        //Восстановление
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
-            string inn=comandBox.Text;
-            string buf = "";
-            for (int i=1;i<=inn.Length/5;i++)
-            {
-                buf = buf+"\"" + inn.Substring((i-1)*5, 5) + "\",";
-                if (i % 10 == 0) buf += "\n";
-            }
-            inndataBox.Text=buf;
+            dataBox.Text += ("\n Команда не предусмотрена \n");
         }
 
         private void Button_Click_7(object sender, RoutedEventArgs e)
         {
             dataBox.Text = "";
+        }
+
+
+
+         public string GetMD5OFIDs()
+            {
+                Dictionary<string, string> ids =
+               new Dictionary<string, string>();
+
+                ManagementObjectSearcher searcher;
+
+                //процессор
+                searcher = new ManagementObjectSearcher("root\\CIMV2",
+                       "SELECT * FROM Win32_Processor");
+                foreach (ManagementObject queryObj in searcher.Get())
+                    ids.Add("ProcessorId", queryObj["ProcessorId"].ToString());
+
+                //мать
+                searcher = new ManagementObjectSearcher("root\\CIMV2",
+                       "SELECT * FROM CIM_Card");
+                foreach (ManagementObject queryObj in searcher.Get())
+                    ids.Add("CardID", queryObj["SerialNumber"].ToString());
+                //UUID
+                searcher = new ManagementObjectSearcher("root\\CIMV2",
+                       "SELECT UUID FROM Win32_ComputerSystemProduct");
+                foreach (ManagementObject queryObj in searcher.Get())
+                    ids.Add("UUID", queryObj["UUID"].ToString());
+
+                string outp = "";
+                foreach (var x in ids)
+                    outp += x.Value;
+                var md5 = MD5.Create();
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(outp));
+
+                return Convert.ToBase64String(hash);
+            
+            }
+
+        private void comandBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

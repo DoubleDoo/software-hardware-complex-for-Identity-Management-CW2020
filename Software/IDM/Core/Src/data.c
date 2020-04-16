@@ -5,6 +5,104 @@ devAddr = (0x50 << 1);
 startaddressfordata=0x1000;
 
 
+void deviceIsntInit()
+{
+
+	ssd1306_SetCursor(2,2);
+	ssd1306_WriteString("Start init from", Font_7x10, White);
+	ssd1306_SetCursor(2,12);
+		ssd1306_WriteString("your PC", Font_7x10, White);
+	ssd1306_UpdateScreen();
+
+}
+
+void uploadIsInit()
+{
+	writeToEeprom(0x0000,&isInit ,1);
+}
+
+void downloadIsInit()
+{
+	readFromEeprom(0x0000, &isInit,1);
+	ssd1306_SetCursor(2,2);
+	ssd1306_WriteStringUint(isInit, Font_7x10, White);
+	ssd1306_UpdateScreen();
+}
+
+void uploadSecureOpt()
+{
+	writeToEeprom(0x0000+1,&ProtectType ,1);
+}
+
+void downloadSecureOpt()
+{
+	readFromEeprom(0x0000+1, &ProtectType,1);
+	ssd1306_SetCursor(12,2);
+	ssd1306_WriteStringUint(ProtectType, Font_7x10, White);
+	ssd1306_UpdateScreen();
+}
+
+void uploadPassword()
+{
+	writeToEeprom(0x0000+2,&password ,6);
+}
+
+void downloadPassword()
+{
+	readFromEeprom(0x0000+2, &password,6);
+	ssd1306_SetCursor(12,50);
+	ssd1306_WriteStringUint(password[0], Font_7x10, White);
+	ssd1306_WriteStringUint(password[1], Font_7x10, White);
+	ssd1306_WriteStringUint(password[2], Font_7x10, White);
+	ssd1306_WriteStringUint(password[3], Font_7x10, White);
+	ssd1306_WriteStringUint(password[4], Font_7x10, White);
+	ssd1306_UpdateScreen();
+}
+
+void uploadPCIDcount()
+{
+	writeToEeprom(0x0000+8,&M5PPCIDCount ,1);
+}
+
+void downloadPCIDcount()
+{
+	readFromEeprom(0x0000+8, &M5PPCIDCount,1);
+	ssd1306_SetCursor(22,2);
+	ssd1306_WriteStringUint(M5PPCIDCount, Font_7x10, White);
+	ssd1306_UpdateScreen();
+}
+
+void uploadDataCount()
+{
+	writeToEeprom(0x0000+9,&DataCount ,1);
+}
+
+void downloadDataCount()
+{
+	readFromEeprom(0x0000+9, &DataCount,1);
+	ssd1306_SetCursor(32,2);
+	ssd1306_WriteStringUint(DataCount, Font_7x10, White);
+	ssd1306_UpdateScreen();
+}
+
+
+void uploadPCIDmas()
+{
+	//writeToEeprom(0x0000,&isInit ,1);
+}
+
+void downloadPCIDmas()
+{
+	//readFromEeprom(0x0000, &isInit,1);
+	//ssd1306_SetCursor(2,20);
+	//ssd1306_WriteStringUint(isInit, Font_7x10, White);
+	//ssd1306_UpdateScreen();
+}
+
+
+
+
+
 
 uint8_t  lt[] =
 {
@@ -239,8 +337,8 @@ void initConstants()
 	ProtectType=0;
 	settingsMenuStatus=0;
 	dataControlMenuStatus=0;
-	sconstants.blockscount=3;
-	initStatus=1;
+	DataCount=3;
+	initStatus=0;
 	initStatusStep1=0;
 	initStatusStep2=0;
 	restoreStatusStep1=0;
@@ -252,19 +350,24 @@ void initConstants()
 	datasettingsStatus=0;
 	setPasswordStep1=0;
 	setPasswordStep2=0;
-	password[0]=0;
-	password[1]=0;
-	password[2]=0;
-	password[3]=0;
-	password[4]=0;
-	imputpassword[0]=0;
-	imputpassword[1]=0;
-	imputpassword[2]=0;
-	imputpassword[3]=0;
-	imputpassword[4]=0;
+
 	setProtectTypeStep1=0;
 	setProtectTypeStep2=0;
+	passwordInputStatus=0;
 
+	leftButtonStatus=0;
+		rightButtonStatus=0;
+		bothButtonStatus=0;
+
+		M5PCIDdefaultIsGetted=0;
+
+		downloadIsInit();
+		downloadSecureOpt();
+		downloadPassword();
+		downloadPCIDcount();
+		downloadDataCount();
+	sconstants.blockscount=DataCount;
+	//downloadPCIDmas();
 	generatePassFrase();
 
 }
@@ -339,7 +442,7 @@ void initProcess2()
 	ssd1306_Write_To_Bufer(2,54,8,8,cancel);
 	ssd1306_Write_To_Bufer(120,54,8,8,ok);
 	ssd1306_UpdateScreen();
-	generateRandomNumbers(11,0xf);
+	generateRandomNumbers(12,0xf);
 
 }
 
@@ -366,7 +469,8 @@ void initProcess2Next()
 	else {
 		//fCheckStatus=1;
 		//initStatus=0;
-		generateExtraData();
+		initStatusStep2=0;
+		setPasswordProcess1();
 	}
 
 
@@ -374,14 +478,26 @@ void initProcess2Next()
 
 void generateExtraData()
 {
-	initStatusStep2=0;
-	ssd1306_Fill(Black);
-	ssd1306_SetCursor(2,30);
-	ssd1306_WriteString("Data generating...", Font_7x10, White);
-	ssd1306_UpdateScreen();
-	//HAL_Delay(2000);
+	isInit=1;
+	uploadIsInit();
+	uploadSecureOpt();
+    uploadPassword();
+	uploadPCIDcount();
+	DataCount=0;
+	sconstants.blockscount=DataCount;
+	uploadDataCount();
 
-	setPasswordProcess1();
+
+	//uploadPCIDmas();
+
+	downloadIsInit();
+		downloadSecureOpt();
+		downloadPassword();
+		downloadPCIDcount();
+		downloadDataCount();
+
+		//downloadPCIDmas();
+		HAL_Delay(10000);
 }
 
 
@@ -542,15 +658,14 @@ void  setPasswordProcess2Next()
 		//char* passFrase[12];
 		}
 		else {
+			if(passwordInputStatus==0)
+			{
 			if(imputpassword[0]==password[0]&&imputpassword[1]==password[1]&&imputpassword[2]==password[2]&&imputpassword[3]==password[3]&&imputpassword[4]==password[4])
 			{
 
 				setPasswordStep2=0;
 				setProtectTypeProcess1();
-				//menuStatus=1;
-				//setProtectTypeStep1=1;
-				//ssd1306_UpdateScreen();
-				//initMenu();
+
 			}
 			else{
 				setPasswordStep1=1;
@@ -566,6 +681,20 @@ void  setPasswordProcess2Next()
 								imputpassword[3]=0;
 								imputpassword[4]=0;
 							setPasswordProcess1();
+			}
+			}
+			else
+			{
+				if(imputpassword[0]==password[0]&&imputpassword[1]==password[1]&&imputpassword[2]==password[2]&&imputpassword[3]==password[3]&&imputpassword[4]==password[4])
+				{
+					setPasswordStep2=0;
+					menuStatus=1;
+				    initMenu();
+			    }
+				else
+				{
+					setPasswordProcess2();
+				}
 			}
 		}
 }
@@ -607,6 +736,7 @@ void setProtectTypeProcess1()
 
 void setProtectTypeProcess1Next(){
 	ProtectType=pointer;
+	generateExtraData();
 	menuStatus=1;
 	setProtectTypeStep1=0;
 	initMenu();
@@ -786,9 +916,14 @@ void settingsMenu()
 											break;
 								case 3:
 											ssd1306_SetCursor(10,39);
-											ssd1306_WriteString("      Back        ", Font_7x10, White);
+											ssd1306_WriteString("Change Protection", Font_7x10, White);
 											ssd1306_UpdateScreen();
 											break;
+								case 4:
+																			ssd1306_SetCursor(10,39);
+																			ssd1306_WriteString("      Back        ", Font_7x10, White);
+																			ssd1306_UpdateScreen();
+																			break;
 
 								}
 }
@@ -796,7 +931,7 @@ void settingsMenu()
 void settingsMenuUp()
 {
 	pointer++;
-		if(pointer>3){
+		if(pointer>4){
 			pointer=0;
 
 		}
@@ -818,6 +953,11 @@ void settingsMenuUp()
 							ssd1306_UpdateScreen();
 							break;
 				case 3:
+															ssd1306_SetCursor(10,39);
+															ssd1306_WriteString("Change Protection", Font_7x10, White);
+															ssd1306_UpdateScreen();
+															break;
+				case 4:
 							ssd1306_SetCursor(10,39);
 							ssd1306_WriteString("      Back        ", Font_7x10, White);
 							ssd1306_UpdateScreen();
@@ -831,7 +971,7 @@ void settingsMenuDown()
 {
 	pointer--;
 		if(pointer<0){
-			pointer=3;
+			pointer=4;
 
 		}
 		switch(pointer)
@@ -852,6 +992,11 @@ void settingsMenuDown()
 									ssd1306_UpdateScreen();
 									break;
 						case 3:
+																	ssd1306_SetCursor(10,39);
+																	ssd1306_WriteString("Change Protection", Font_7x10, White);
+																	ssd1306_UpdateScreen();
+																	break;
+						case 4:
 									ssd1306_SetCursor(10,39);
 									ssd1306_WriteString("      Back      ", Font_7x10, White);
 									ssd1306_UpdateScreen();
@@ -876,6 +1021,9 @@ void settingsMenuSelect()
 								 exportModeMenu();
 										break;
 							case 3:
+								//exportModeMenu();
+										break;
+							case 4:
 								settingsMenuStatus=0;
 							    menuStatus=1;
 							    updateScreen();

@@ -148,14 +148,8 @@ static void MX_TIM6_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	leftButtonStatus=0;
-	rightButtonStatus=0;
-	bothButtonStatus=0;
-	//endDataPointer=0;
-	//startDataPointer=0;
-	//dataReciveBufer[0]=(char)'t';
-	//dataReciveBufer[1]=(char)'s';
-	//endDataPointer=2;
+
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -188,10 +182,92 @@ int main(void)
    ssd1306_Fill(White);
    ssd1306_UpdateScreen();
    ssd1306_Fill(Black);
-   generateRandomNumbers(12,0xf);
-   ssd1306_UpdateScreen();
-   HAL_Delay(10000);
 
+
+   initConstants();
+   ssd1306_SetCursor(20,20);
+      ssd1306_WriteStringUint(isInit, Font_7x10, White);
+      ssd1306_SetCursor(30,20);
+            ssd1306_WriteStringUint(ProtectType, Font_7x10, White);
+            ssd1306_SetCursor(40,20);
+                  ssd1306_WriteStringUint(M5PPCIDCount, Font_7x10, White);
+                  ssd1306_SetCursor(50,20);
+                        ssd1306_WriteStringUint(DataCount, Font_7x10, White);
+   ssd1306_UpdateScreen();
+   HAL_Delay(3000);
+   if (isInit==0)
+   {
+	   deviceIsntInit();
+   }
+
+   else
+   {
+	   if(ProtectType==0)
+	   {
+		   menuStatus=1;
+		   initMenu();
+	   }
+	   else if(ProtectType==1)
+	   {
+
+		   setPasswordStep2=1;
+		   passwordInputStatus=1;
+		   setPasswordProcess2();
+	   }
+	   else if(ProtectType==2)
+	   {
+	   		//
+		   menuStatus=1;
+		   initMenu();
+	   }
+	   else if(ProtectType==3)
+	   {
+		   //
+		   setPasswordStep2=1;
+		   passwordInputStatus=1;
+		   setPasswordProcess2();
+	   }
+
+
+
+   }
+
+
+   //generateRandomNumbers(12,0xf);
+   /*
+   HAL_Delay(3000);
+   downloadPassword();
+   downloadIsInit();
+   downloadSecureOpt();
+
+   ssd1306_SetCursor(20,20);
+   ssd1306_WriteStringUint(isInit, Font_7x10, White);
+   ssd1306_SetCursor(30,20);
+   ssd1306_WriteStringUint(ProtectType, Font_7x10, White);
+
+
+
+
+
+
+  // MD5PCID[0]="12341234123412341234";
+ //  MD5PCID[1]="00000000000000000000";
+ //  PubAndPrivKeys[0]="wers";
+//
+  // HAL_HASH_SHA1_Start(&hhash, &MD5PCID[0] , 20, &MD5PCID[1], HAL_MAX_DELAY);
+  // HAL_HASH_SHA1_Accumulate(&hhash, &MD5PCID[0] , 20);
+
+  // HAL_Delay(1000);
+  // CDC_Transmit_FS(MD5PCID[0], 20);
+  // HAL_Delay(10);
+  // HAL_Delay(10);
+    //  CDC_Transmit_FS((uint8_t*)MD5PCID[1], 20);
+  //    HAL_Delay(10);
+
+   ssd1306_UpdateScreen();
+
+   HAL_Delay(10000);
+*/
    //пример записи в память
 
 
@@ -333,14 +409,16 @@ int main(void)
    addDataBlock(inpt);
    HAL_Delay(1000);
    sendAllData();*/
-   initConstants();
-   initChoseProcess();
+   //initConstants();
+   //initChoseProcess();
 
    //generatePassFrase();
 
 
 
    //updateScreen();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -350,21 +428,98 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-/*
-    HAL_Delay(1000);
-    if(dataReciveBufer!=0)
+
+    HAL_Delay(300);
+    if(dataReciveBufer[0]!=0)
     {
-    	//if(dataReciveBufer[])
-    	CDC_Transmit_FS(dataReciveBufer, sizeof(dataReciveBufer));
+    	//начать инициацию
+    	if(dataReciveBufer[0]=='P')
+    	{
+    		if(M5PCIDdefaultIsGetted==0)
+    		{
+    		for(uint32_t i=2;i<27;i++)
+    		{
+    		 		PCIDt[i-2]=dataReciveBufer[i];
+    		}
+    		M5PPCIDCount+=1;
+    		MD5PCID[0]=PCIDt;          //MD5PCID загрузка в память
+    		CDC_Transmit_FS("OK", 2);
+    		M5PCIDdefaultIsGetted=1;  //M5PCIDdefaultIsGetted загрузка в память
+    		initStatus=1;
+    	    initChoseProcess();
+    		}
+    		else
+    		{
+    			M5PCIDdefaultIsGetted=1;
+    			CDC_Transmit_FS("OK", 2);
+    		}
+    	}
+    	//добавить идент. данные
+    	if(dataReciveBufer[0]=='N')
+    	{
+
+    		CDC_Transmit_FS("OK", 2);
+    	}
+    	//импорт
+    	if(dataReciveBufer[0]=='I')
+    	{
+
+    		CDC_Transmit_FS("OK", 2);
+    	}
+    	//сброс
+    	if(dataReciveBufer[0]=='C')
+    	{
+
+    		CDC_Transmit_FS("OK", 2);
+    	}
+    	//добавить безопасный ПК
+    	if(dataReciveBufer[0]=='A')
+    	{
+
+    		CDC_Transmit_FS("OK", 2);
+    	}
+
     	for(uint32_t i=0;i<usbBuferSize;i++)
     	{
     		  dataReciveBufer[i]=0;
     	}
     }
-*/
+    else
+    {
+    //	ssd1306_SetCursor(2,2);
+   // 	ssd1306_WriteString("0", Font_7x10, White);
+    //	ssd1306_UpdateScreen();
+    }
+
+  }
+
+    /*
+    	if(dataReciveBufer[0]==(uint8_t)"P")
+    	{
+    			   PCReciveProces=1;
+    			   ssd1306_SetCursor(2,2);
+    			   ssd1306_WriteString(dataReciveBufer, Font_7x10, White);
+    			   ssd1306_UpdateScreen();
+    	}
+    	//CDC_Transmit_FS(dataReciveBufer, sizeof(dataReciveBufer));
+    	//for(uint32_t i=0;i<usbBuferSize;i++)
+    	//{
+    	//	  dataReciveBufer[i]=0;
+    	//}
+    }
+   //if(PCReciveProces==1)
+    //{
+   // 	CDC_Transmit_FS("OK", 2);
+   // 	HAL_Delay(100);
+   // 	PCReciveProces=0;
+   // }
+   // ssd1306_SetCursor(2,2);
+     //   			   ssd1306_WriteString(&dataReciveBufer, Font_7x10, White);
+       // 			   ssd1306_UpdateScreen();
+
 
    // CDC_Transmit_FS(wmsg, sizeof(wmsg));
-  }
+ // }
   /* USER CODE END 3 */
 }
 
@@ -804,7 +959,8 @@ void generateRandomNumbers(uint16_t blocknumber,uint16_t filter)
 		dev=dev*10;
 		count++;
 	}*/
-	_Bool isOk=0;
+	//_Bool isOk=0;
+	uint16_t j=0;
 	for(uint16_t i=0;i<12;i++)
 		{
 		    RNGNumbers[i]=HAL_RNG_GetRandomNumber(&hrng)&filter;
@@ -829,15 +985,18 @@ void generateRandomNumbers(uint16_t blocknumber,uint16_t filter)
 	}
 	for(uint16_t i=0;i<12;i++)
 	{
-		for(uint16_t j=0;j<i;j++)
+		j=0;
+		while(j<i)
 		{
-			while(RNGNumbers[i]==RNGNumbers[j]||(RNGNumbers[i]>=blocknumber))
+			if(RNGNumbers[i]==RNGNumbers[j]||(RNGNumbers[i]>=blocknumber))
 			{
 				RNGNumbers[i]=HAL_RNG_GetRandomNumber(&hrng)&filter;
+				j=0;
 			}
+			else j++;
 		}
 	}
-
+/*
 	for(uint16_t i=0;i<6;i++)
 		{
 		ssd1306_SetCursor(2,10+i*10);
@@ -846,11 +1005,7 @@ void generateRandomNumbers(uint16_t blocknumber,uint16_t filter)
 		ssd1306_WriteStringUint(RNGNumbers[i+6], Font_7x10, White);
 	    }
 	ssd1306_SetCursor(2,0);
-	ssd1306_WriteStringUint(filter, Font_7x10, White);
-	/*
-
-	RNG[0]=HAL_RNG_GetRandomNumber(&hrng)&0x000001FF;*/
-	//RNGNumbers[12];
+	ssd1306_WriteStringUint(filter, Font_7x10, White);*/
 }
 
 

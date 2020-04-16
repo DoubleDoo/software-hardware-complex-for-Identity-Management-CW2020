@@ -53,6 +53,7 @@ _Bool isUSBBusy;
 char* passFrase[12];
 
 uint16_t* isInit;
+
 uint16_t* initStatus;
 uint16_t* initStatusStep1;
 uint16_t* initStatusStep2;
@@ -65,6 +66,7 @@ uint16_t* setPasswordStep2;
 uint16_t* ProtectType;
 uint16_t* setProtectTypeStep1;
 uint16_t* setProtectTypeStep2;
+uint16_t* passwordInputStatus;
 
 uint16_t* settingsMenuStatus;
 
@@ -77,7 +79,17 @@ uint16_t* settingsStatus;
 uint16_t* datasettingsStatus;
 uint8_t dataReciveBufer[usbBuferSize];
 
+uint16_t* M5PCIDdefaultIsGetted;
+uint16_t* devpreinitmenu;
+
+uint8_t* M5PPCIDCount;
+
+uint8_t* DataCount;
+
 uint16_t RNGNumbers[12];
+uint8_t* MD5PCID[6];
+char PCIDt[24];
+uint8_t* PubAndPrivKeys[3];
 
 //uint16_t startDataPointer;
 //uint16_t endDataPointer;
@@ -94,15 +106,11 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void leftButtonActions(void);
-
 void rightButtonActions(void);
-
 void bothButtonActions(void);
 void generatePassFrase(void);
 void generateRandomNumbers(uint16_t blocknumber,uint16_t filter);
 
-
-void printCounter(uint16_t i);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
