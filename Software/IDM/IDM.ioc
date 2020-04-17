@@ -1,8 +1,9 @@
 #MicroXplorer Configuration settings - do not modify
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
-HASH.IPParameters=SecureHashAlgorithmType
-HASH.SecureHashAlgorithmType=MD5
+HASH.DataType=HASH_DATATYPE_8B
+HASH.IPParameters=SecureHashAlgorithmType,DataType
+HASH.SecureHashAlgorithmType=SHA1
 KeepUserPlacement=false
 Mcu.Family=STM32F2
 Mcu.IP0=CRC

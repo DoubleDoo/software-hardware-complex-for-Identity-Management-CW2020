@@ -19,6 +19,7 @@ using System.Management;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows.Forms;
 
 namespace IDMCompanion
 {
@@ -30,12 +31,14 @@ namespace IDMCompanion
         private bool usbThreadWorking;
         private string usbbufer;
         private Thread usbThread;
+        private Thread usbThreadAn;
         private SerialPortStream serialPort;
         private int counter = 0;
 
         public MainWindow()
         {
             InitializeComponent();
+            usbbufer = "";
         }
 
         [STAThread]
@@ -48,12 +51,15 @@ namespace IDMCompanion
             {
               
                 usbThread = new Thread(new ThreadStart(usbThreadFunk));
-                
+                usbThreadAn = new Thread(new ThreadStart(usbThreadAnalys));
                 usbThread.Start();
+               // System.Threading.Thread.Sleep(50);
+                usbThreadAn.Start();
             }
            else
             {
                 usbThread.Abort();
+                usbThreadAn.Abort();
                 serialPort.Close();
                 dataBox.Text += ("Disconnected" + "\n");
             }
@@ -74,7 +80,9 @@ namespace IDMCompanion
                     while (serialPort.IsOpen)
                     {
                         char ch = (char)serialPort.ReadChar();
-                        this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ch));
+                        this.Dispatcher.Invoke(() => usbbufer += (ch));
+                        this.Dispatcher.Invoke(() => dataBox.Text += (ch));
+
                     }
                 }
             }
@@ -85,15 +93,120 @@ namespace IDMCompanion
         }
 
 
-       // private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-       // {
+        private void usbThreadAnalys()
+        {
+            /*
+            string bufer="";
+            while (usbThreadWorking)
+            {
+                this.Dispatcher.Invoke(() => bufer=usbbufer);
+                if (bufer.IndexOf("log:") > 0)
+                {
+                    this.Dispatcher.Invoke(() => dataBox.Text += "!" + bufer.Substring(bufer.IndexOf("log("), 16) + "!");
+                    bufer = "";
+                }
+                if (bufer.IndexOf("pas:") > 0)
+                {
+                    this.Dispatcher.Invoke(() => dataBox.Text += "!" + bufer.Substring(bufer.IndexOf("pas("), 16) + "!");
+                    bufer = "";
+                }
+            }*/
 
-      //      this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ReadChar().ReadExisting() + "\n"));
-      //  }
+            /*
+            bool log = false;
+            bool pas = false;
+            while (usbThreadWorking)
+            {
+                this.Dispatcher.Invoke(() => 
+                {
+                    if (dataBox.Text.IndexOf("log:") > 0) log = true;
+                });
+                this.Dispatcher.Invoke(() =>
+                {
+                    if (dataBox.Text.IndexOf("pas:") > 0) pas = true;
+                });
+
+                if (log)
+                    {
+                    this.Dispatcher.Invoke(() => dataBox.Text += "1"); //+ usbbufer.Substring(usbbufer.IndexOf("log:"), 16) + "!");
+                        usbbufer = "";
+                    }
+                    else if (pas)
+                    {
+                        this.Dispatcher.Invoke(() => dataBox.Text += "2"); // + usbbufer.Substring(usbbufer.IndexOf("pas:"), 16) + "!");
+                    usbbufer = "";
+                    }
+                else
+                {
+                    this.Dispatcher.Invoke(() => dataBox.Text += "");
+                }
+                
+            }*/
+            while(true)
+            {
+                if (usbbufer.Length > 0)
+                {
+                    System.Threading.Thread.Sleep(100);
+                    string login = "";
+                    string password = "";
+                    bool log = false;
+                    bool pas = false;
+
+                    if (usbbufer.IndexOf("l")>=0)
+                    {
+                        //this.Dispatcher.Invoke(() => dataBox.Text += "!" + usbbufer.Substring(usbbufer.IndexOf("l") + 3, 16) + "!");
+                        if (usbbufer[usbbufer.IndexOf("l")+2]=='o'&& usbbufer[usbbufer.IndexOf("l") + 4] == 'g' && usbbufer[usbbufer.IndexOf("l") + 6] == ':')
+                        {
+                            this.Dispatcher.Invoke(() =>login = usbbufer.Substring(usbbufer.IndexOf("l")+7));
+                            log = true;
+                            usbbufer = "";
+                        }
+                        
+                    }
+                    if (usbbufer.IndexOf("p") >= 0)
+                    {
+                        if (usbbufer[usbbufer.IndexOf("p") + 2] == 'a' && usbbufer[usbbufer.IndexOf("p") + 4] == 's' && usbbufer[usbbufer.IndexOf("p") + 6] == ':')
+                        {
+                            this.Dispatcher.Invoke(() => password =  usbbufer.Substring(usbbufer.IndexOf("p") + 7));
+                            pas = true;
+                            usbbufer = "";
+                        }
+                    }
+
+                    if (log)
+                    {
+                        SendKeys.SendWait(login);
+                        SendKeys.SendWait("{ENTER}");
+                    }
+
+                    if (pas)
+                    {
+                        byte[] bytes = Encoding.ASCII.GetBytes(password);
+                        StringBuilder hex = new StringBuilder(bytes.Length * 2);
+                        foreach (byte b in bytes)
+                            hex.AppendFormat("{0:x2}", b);
+                        password=hex.ToString();
+                        SendKeys.SendWait(password);
+                        SendKeys.SendWait("{ENTER}");
+
+                        //this.Dispatcher.Invoke(() => dataBox.Text +="|"+ hex.ToString()+"|"); 
+                    }
+                    // this.Dispatcher.Invoke(() => dataBox.Text += usbbufer.IndexOf("l") + " ");
+                    // usbbufer = "";
+                }
+            }
+        }
+
+
+        // private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        // {
+
+        //      this.Dispatcher.Invoke(() => dataBox.Text = dataBox.Text += (ReadChar().ReadExisting() + "\n"));
+        //  }
 
 
 
-         //отправка данных
+        //отправка данных
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (usbThreadWorking)
@@ -112,7 +225,7 @@ namespace IDMCompanion
                    
                     while (comandBoxstr.Length < 16) { comandBoxstr += " "; }
                     while (inndataBoxstr.Length < 16) { inndataBoxstr += " "; }
-                    data = "N " + comandBoxstr + inndataBoxstr;
+                    data = "N " + inndataBoxstr + comandBoxstr ;
                     while (data.Length < 64) { data += " "; }
                 }
                 serialPort.Write(data);

@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -46,59 +46,106 @@ extern "C" {
 /* USER CODE BEGIN EC */
 #define usbBuferSize 128
 #define usbBlockSize 64
+
+//Переменные кнопок
 _Bool leftButtonStatus;
 _Bool rightButtonStatus;
 _Bool bothButtonStatus;
-_Bool isUSBBusy;
-char* passFrase[12];
 
-uint16_t* isInit;
+//шаги инициации
+uint8_t* initStatus;
+uint8_t* initStatusStep1;
+uint8_t* initStatusStep2;
+uint8_t* restoreStatusStep1;
+uint8_t* restoreStatusStep2;
 
-uint16_t* initStatus;
-uint16_t* initStatusStep1;
-uint16_t* initStatusStep2;
-uint16_t* restoreStatusStep1;
-uint16_t* restoreStatusStep2;
+//шаги установки пароля
+uint8_t* setPasswordStep1;
+uint8_t* setPasswordStep2;
 
-uint16_t* setPasswordStep1;
-uint16_t* setPasswordStep2;
+//шаги установки защиты
+uint8_t* ProtectType;
+uint8_t* setProtectTypeStep1;
+uint8_t* setProtectTypeStep2;
+uint8_t* passwordInputStatus;
 
-uint16_t* ProtectType;
-uint16_t* setProtectTypeStep1;
-uint16_t* setProtectTypeStep2;
-uint16_t* passwordInputStatus;
-
-uint16_t* settingsMenuStatus;
-
-uint16_t* dataControlMenuStatus;
-
-uint16_t* menuStatus;
-uint16_t* restoreStatus;
-uint16_t* setPasswordStatus;
-uint16_t* settingsStatus;
-uint16_t* datasettingsStatus;
+//буферы
 uint8_t dataReciveBufer[usbBuferSize];
+int16_t bufer[20];
+char bufer2[64];
 
-uint16_t* M5PCIDdefaultIsGetted;
-uint16_t* devpreinitmenu;
-
-uint8_t* M5PPCIDCount;
-
+//Данные
 uint8_t DataCount;
 
+//переменные команд
+uint8_t* restoreStatus;
+uint8_t* setPasswordStatus;
+uint8_t* settingsStatus;
 uint8_t* ResetComand;
 uint8_t* chpassComand;
 uint8_t* cProtectComand;
 
+//переменные разрешений
 uint8_t* exportEnable;
+uint8_t* addDeviceEnable;
+uint8_t* M5PCIDdefaultIsGetted;
+uint8_t* isInit;
 
+//переменные меню
+uint8_t DataInfoMenu;
+uint8_t* devpreinitmenu;
+uint8_t* datasettingsStatus;
+uint8_t* menuStatus;
+uint8_t* settingsMenuStatus;
+uint8_t* dataControlMenuStatus;
+
+//Секретные ключи
+int16_t privateKey[20];
+int16_t publicKey[20];
+char* passFrase[12];
+
+//генератор рандоманых чисел
 uint16_t RNGNumbers[12];
-uint8_t* MD5PCID[6];
-char PCIDt[24];
-uint8_t* PubAndPrivKeys[3];
 
-//uint16_t startDataPointer;
-//uint16_t endDataPointer;
+//хранение данных о надежных ПК
+uint8_t* M5PPCIDCount;
+uint8_t PCIDOne[24];
+uint8_t PCIDTwo[24];
+uint8_t PCIDThre[24];
+uint8_t PCIDFour[24];
+uint8_t PCIDFive[24];
+uint8_t PCIDbuf[24];
+
+typedef struct {
+	uint8_t datacount;
+	uint8_t blockscount;
+	uint8_t startaddressfordata;
+	uint8_t devisescount;
+	uint8_t startaddressfordevices;
+	uint8_t password;
+} constants;
+
+typedef struct {
+	char *login[16];
+	char *password[16];
+	char *url[16];
+	char *number[16];
+} accauntBlock;
+
+typedef struct {
+	int16_t pointer;
+	accauntBlock *blocks;
+} menuAB;
+
+
+menuAB menu;
+constants sconstants;
+int8_t pointer;
+int8_t updownpointer;
+uint8_t password[6];
+uint8_t imputpassword[6];
+
+uint8_t test[24];
 
 /* USER CODE END EC */
 
@@ -115,6 +162,7 @@ void leftButtonActions(void);
 void rightButtonActions(void);
 void bothButtonActions(void);
 void generatePassFrase(void);
+void changePasswordData(void);
 void generateRandomNumbers(uint16_t blocknumber,uint16_t filter);
 
 /* USER CODE END EFP */

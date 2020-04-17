@@ -1,4 +1,3 @@
-
 #include "stm32f2xx_hal.h"
 #include "fonts.h"
 
@@ -27,7 +26,6 @@
 #define SSD1306_WIDTH           130
 // SSD1306 LCD height in pixels
 #define SSD1306_HEIGHT          64
-
 
 //
 //  Enumeration for screen colors
@@ -58,7 +56,7 @@ void ssd1306_Fill(SSD1306_COLOR color);
 void ssd1306_UpdateScreen(void);
 void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
 char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color);
-char ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color);
+char ssd1306_WriteString(char *str, FontDef Font, SSD1306_COLOR color);
 void ssd1306_SetCursor(uint8_t x, uint8_t y);
 
 #endif
