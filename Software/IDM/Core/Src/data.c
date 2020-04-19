@@ -4,12 +4,34 @@ devAddr = (0x50 << 1);
 startaddressfordata = 0x1000;
 
 void deviceIsntInit() {
-	ssd1306_Fill(Black);
-	ssd1306_SetCursor(2, 2);
-	ssd1306_WriteString("Start init from", Font_7x10, White);
-	ssd1306_SetCursor(2, 12);
-	ssd1306_WriteString("your PC", Font_7x10, White);
-	ssd1306_UpdateScreen();
+	if (M5PCIDdefaultIsGetted) {
+		if (isInit == 0) {
+			initStatus = 1;
+			initChoseProcess();
+		} else if (ProtectType == 2) {
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 2);
+			ssd1306_WriteString("Conect device to", Font_7x10, White);
+			ssd1306_SetCursor(2, 12);
+			ssd1306_WriteString("your safe PC", Font_7x10, White);
+			ssd1306_UpdateScreen();
+		} else if (ProtectType == 3) {
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 2);
+			ssd1306_WriteString("Conect device to", Font_7x10, White);
+			ssd1306_SetCursor(2, 12);
+			ssd1306_WriteString("your safe PC", Font_7x10, White);
+			ssd1306_UpdateScreen();
+		}
+
+	} else {
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(2, 2);
+		ssd1306_WriteString("Start init from", Font_7x10, White);
+		ssd1306_SetCursor(2, 12);
+		ssd1306_WriteString("your safe PC", Font_7x10, White);
+		ssd1306_UpdateScreen();
+	}
 
 }
 
@@ -51,11 +73,11 @@ void downloadPassword() {
 }
 
 void uploadPCIDcount() {
-	writeToEeprom(0x0000 + 8, &M5PPCIDCount, 1);
+	writeToEeprom(0x0200, &M5PPCIDCount, 2);
 }
 
 void downloadPCIDcount() {
-	readFromEeprom(0x0000 + 8, &M5PPCIDCount, 1);
+	readFromEeprom(0x0200, &M5PPCIDCount, 2);
 	//ssd1306_SetCursor(22, 2);
 //	ssd1306_WriteStringUint(M5PPCIDCount, Font_7x10, White);
 	//ssd1306_UpdateScreen();
@@ -110,72 +132,49 @@ void downloadPublic() {
 
 void uploadPCIDmas() {
 
-	//writeToEeprom(0x0300,&PCIDOne ,24);
-	//writeToEeprom(0x0300+24,&PCIDTwo ,24);
-	//	writeToEeprom(0x0300+48,&PCIDThre ,24);
-	//writeToEeprom(0x0300+72,&PCIDFour ,24);
-	//writeToEeprom(0x0300+96,&PCIDFive ,24);
+	writeToEeprom(0x0300 + 100, &PCIDFour, 24);
+	writeToEeprom(0x0300 + 150, &PCIDFive, 24);
+	writeToEeprom(0x0300 + 200, &PCIDOne, 24);
+
+	writeToEeprom(0x0300 + 400, &PCIDSeven, 24);
+	writeToEeprom(0x0300 + 450, &PCIDSix, 24);
 
 	//writeToEeprom(0x0000,&isInit ,1);
 }
 
 void downloadPCIDmas() {
 
-	//for(uint8_t i=0;i<M5PPCIDCount;i++)
+//	for(uint8_t i=0;i<M5PPCIDCount;i++)
 //	{
 	//readFromEeprom(0x0300,&PCIDOne ,24);
-	//readFromEeprom(0x0300+24,&PCIDTwo ,24);
-	//readFromEeprom(0x0300+48,&PCIDThre ,24);
+	//readFromEeprom(0x0300+24,&PCIDSeven ,24);
+	//readFromEeprom(0x0300+48,&PCIDSix ,24);
 	//readFromEeprom(0x0300+72,&PCIDFour ,24);
 	//readFromEeprom(0x0300+96,&PCIDFive ,24);
 //
+	//readFromEeprom(0x0300+260,&PCIDSeven ,24);
+	//readFromEeprom(0x0300+310,&PCIDSix ,24);
+	readFromEeprom(0x0300 + 100, &PCIDFour, 24);
+	readFromEeprom(0x0300 + 150, &PCIDFive, 24);
+	readFromEeprom(0x0300 + 200, &PCIDOne, 24);
 
-	//readFromEeprom(0x0300+24,&MD5PCID[1] ,24);
-	//readFromEeprom(0x0100+48,&MD5PCID[2] ,24);
-	//readFromEeprom(0x0100+72,&MD5PCID[3] ,24);
-	//readFromEeprom(0x0100+96,&MD5PCID[4] ,24);
+	readFromEeprom(0x0300 + 400, &PCIDSeven, 24);
+	readFromEeprom(0x0300 + 450, &PCIDSix, 24);
 	//}
 
 }
 
 uint8_t lt[] = {
 
-
-		0B00000000,
-		0B00000000,
-		0B00000001,
-		0B00000011,
-		0B00000111,
-		0B00001111,
-		0B00011111,
-		0B00111111,
-		0B00111111,
-		0B00011111,
-		0B00001111,
-		0B00000111,
-		0B00000011,
-		0B00000001,
-		0B00000000,
-		0B00000000 };
+0B00000000, 0B00000000, 0B00000001, 0B00000011, 0B00000111, 0B00001111,
+		0B00011111, 0B00111111, 0B00111111, 0B00011111, 0B00001111, 0B00000111,
+		0B00000011, 0B00000001, 0B00000000, 0B00000000 };
 
 uint8_t rt[] = {
 
-0B00000000,
-0B00000000,
-0B10000000,
-0B11000000,
-0B11100000,
-0B11110000,
-0B11111000,
-0B11111100,
-0B11111100,
-0B11111000,
-0B11110000,
-0B11100000,
-0B11000000,
-0B10000000,
-0B00000000,
-0B00000000 };
+0B00000000, 0B00000000, 0B10000000, 0B11000000, 0B11100000, 0B11110000,
+		0B11111000, 0B11111100, 0B11111100, 0B11111000, 0B11110000, 0B11100000,
+		0B11000000, 0B10000000, 0B00000000, 0B00000000 };
 
 uint8_t cancel[] = {
 
@@ -287,6 +286,7 @@ uint8_t gear[] = { 0B00000000, 0B00000001, 0B10000000, 0B00000000, 0B00000000,
  */
 
 void initConstants() {
+	dataTransferEnable = 0;
 	isInit = 0;
 	ProtectType = 0;
 	settingsMenuStatus = 0;
@@ -320,14 +320,13 @@ void initConstants() {
 	downloadPassword();
 	downloadPCIDcount();
 	downloadDataCount();
-	sconstants.blockscount = DataCount;
+	//DataCount = DataCount;
 	downloadaddDeviceEnable();
 	downloadPCIDcount();
-	readFromEeprom(0x0300, &PCIDOne, 24);
 	downloadIsfirstPCt();
 	downloadPublic();
 	downloadPrivate();
-	//downloadPCIDmas();
+	downloadPCIDmas();
 	//generatePassFrase();
 
 }
@@ -413,7 +412,7 @@ void initProcess2Next() {
 		char *text = "Word ";
 		//strcat(text, (char)(pointer+1));
 		ssd1306_WriteString(text, Font_7x10, White);
-		ssd1306_WriteStringUint(RNGNumbers[pointer]+1, Font_7x10, White);
+		ssd1306_WriteStringUint(RNGNumbers[pointer] + 1, Font_7x10, White);
 		ssd1306_SetCursor(25, 25);
 		ssd1306_WriteString(passFrase[RNGNumbers[pointer]], Font_16x26, White);
 		ssd1306_Write_To_Bufer(2, 54, 8, 8, cancel);
@@ -435,7 +434,7 @@ void generateExtraData() {
 	uploadPassword();
 	uploadPCIDcount();
 	DataCount = 0;
-	sconstants.blockscount = DataCount;
+	//DataCount = DataCount;
 	uploadDataCount();
 
 	//uploadPCIDmas();
@@ -481,6 +480,17 @@ void clearDevice() {
 	uploadPCIDcount();
 	uploadDataCount();
 	//uploadPCIDmas();
+
+	uint8_t nul = 0;
+	for (int i = 0; i < 1000; i++) {
+		writeToEeprom(i, &nul, 1);
+	}
+	for (int i = 0; i < 1000; i++) {
+		writeToEeprom(0x0300 + i, &nul, 1);
+	}
+	for (int i = 0; i < 1000; i++) {
+		writeToEeprom(0x1000 + i, &nul, 1);
+	}
 
 }
 
@@ -689,6 +699,7 @@ void setPasswordProcess2Next() {
 					&& imputpassword[3] == password[3]
 					&& imputpassword[4] == password[4]) {
 				setPasswordStep2 = 0;
+				Unlocked = 1;
 				menuStatus = 1;
 				initMenu();
 			} else {
@@ -700,7 +711,7 @@ void setPasswordProcess2Next() {
 
 void setProtectTypeProcess1() {
 	setProtectTypeStep1 = 1;
-	pointer = 0;
+	pointer = ProtectType;
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(2, 10);
 	ssd1306_WriteString("Choose secure mode", Font_7x10, White);
@@ -721,6 +732,7 @@ void setProtectTypeProcess1Next() {
 		ProtectType = pointer;
 		generateExtraData();
 		menuStatus = 1;
+		Unlocked = 1;
 		setProtectTypeStep1 = 0;
 		initMenu();
 	}
@@ -729,28 +741,28 @@ void setProtectTypeProcess1Next() {
 
 void setProtectTypeProcessDefault() {
 	switch (pointer) {
-		case 0:
-			ssd1306_SetCursor(10, 35);
-			ssd1306_WriteString("      none      ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 1:
-			ssd1306_SetCursor(10, 35);
-			ssd1306_WriteString("    password    ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 2:
-			ssd1306_SetCursor(10, 35);
-			ssd1306_WriteString("      PC ID     ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 3:
-			ssd1306_SetCursor(10, 35);
-			ssd1306_WriteString("PC ID + password", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
+	case 0:
+		ssd1306_SetCursor(10, 35);
+		ssd1306_WriteString("      none      ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 1:
+		ssd1306_SetCursor(10, 35);
+		ssd1306_WriteString("    password    ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 2:
+		ssd1306_SetCursor(10, 35);
+		ssd1306_WriteString("      PC ID     ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 3:
+		ssd1306_SetCursor(10, 35);
+		ssd1306_WriteString("PC ID + password", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
 
-		}
+	}
 }
 
 void setProtectTypeProcess1Up() {
@@ -770,39 +782,41 @@ void setProtectTypeProcess1Down() {
 }
 
 void sendAllData() {
-	CDC_Transmit_FS("begin", 5);
-	for (uint16_t i = 0; i < sconstants.blockscount; i++) {
-		char buf[64] = "abc";
-		readFromEeprom(startaddressfordata + 64 * i, buf, 64);
+	CDC_Transmit_FS("begin(", 6);
+	for (uint16_t i = 0; i < DataCount; i++) {
+		char buf[16] = "abc";
+		readFromEeprom(startaddressfordata + 64 * i, buf, 16);
 		HAL_Delay(10);
-		CDC_Transmit_FS(buf, 64);
+		CDC_Transmit_FS(buf, 16);
+		HAL_Delay(10);
+		readFromEeprom(startaddressfordata + 64 * i + 32, buf, 32);
+		HAL_Delay(10);
+		CDC_Transmit_FS(buf, 32);
 		HAL_Delay(10);
 	}
 	HAL_Delay(10);
-	CDC_Transmit_FS("end", 3);
+	CDC_Transmit_FS(")end", 4);
 }
 
 void addDataBlock(uint8_t *data) {
-	sconstants.blockscount++;
-	menu.pointer = sconstants.blockscount - 1;
-	accauntBlock buf[sconstants.blockscount + 1];
-	for (uint16_t i = 0; i < sconstants.blockscount - 1; i++) {
+	DataCount++;
+	menu.pointer = DataCount - 1;
+	accauntBlock buf[DataCount + 1];
+	for (uint16_t i = 0; i < DataCount - 1; i++) {
 		buf[i] = menu.blocks[i];
 	}
-	writeToEeprom(startaddressfordata + 64 * (sconstants.blockscount - 1), data,
-			64);
+	writeToEeprom(startaddressfordata + 64 * (DataCount - 1), data, 64);
 	char buf2[64] = "";
-	readFromEeprom(startaddressfordata + 64 * (sconstants.blockscount - 1),
-			buf2, 64);
-	stringToStruct(&buf2, &buf[sconstants.blockscount - 1]);
+	readFromEeprom(startaddressfordata + 64 * (DataCount - 1), buf2, 64);
+	stringToStruct(&buf2, &buf[DataCount - 1]);
 	menu.blocks = buf;
 	updateScreen();
 }
 
 void initMenu() {
 	menu.pointer = -1;
-	accauntBlock blocks[sconstants.blockscount + 1];
-	for (uint16_t i = 0; i < sconstants.blockscount; i++) {
+	accauntBlock blocks[DataCount + 1];
+	for (uint16_t i = 0; i < DataCount; i++) {
 		char buf[64] = "";
 		readFromEeprom(startaddressfordata + 64 * i, buf, 64);
 		stringToStruct(&buf, &blocks[i]);
@@ -814,7 +828,7 @@ void initMenu() {
 void updateScreen() {
 	if (menu.pointer < -1) {
 		menu.pointer++;
-	} else if (menu.pointer > sconstants.blockscount - 1) {
+	} else if (menu.pointer > DataCount - 1) {
 		menu.pointer--;
 	} else if (menu.pointer != -1) {
 		visualizeStruct(&menu.blocks[menu.pointer]);
@@ -824,8 +838,13 @@ void updateScreen() {
 		ssd1306_Write_To_Bufer(48, 20, 32, 32, gear);
 
 	}
-	ssd1306_Write_To_Bufer(2, 50, 8, 16, lt);
-	ssd1306_Write_To_Bufer(120, 50, 8, 16, rt);
+	if (DataCount != 0) {
+		if (menu.pointer > -1)
+			ssd1306_Write_To_Bufer(2, 50, 8, 16, lt);
+		if (menu.pointer < DataCount - 1)
+			ssd1306_Write_To_Bufer(120, 50, 8, 16, rt);
+	}
+
 	ssd1306_UpdateScreen();
 }
 
@@ -841,35 +860,34 @@ void chooseMainMenu() {
 
 void settingsMenuDefault() {
 	switch (pointer) {
-		case 0:
-			ssd1306_SetCursor(7, 30);
-			ssd1306_WriteString(" Change password ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 1:
-			ssd1306_SetCursor(7, 30);
-			ssd1306_WriteString("   Reset device  ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 2:
-			ssd1306_SetCursor(7, 30);
-			ssd1306_WriteString("   Export mode   ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 3:
-			ssd1306_SetCursor(7, 30);
-			ssd1306_WriteString("Change Protection", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
-		case 4:
-			ssd1306_SetCursor(7, 30);
-			ssd1306_WriteString("      Back       ", Font_7x10, White);
-			ssd1306_UpdateScreen();
-			break;
+	case 0:
+		ssd1306_SetCursor(7, 30);
+		ssd1306_WriteString(" Change password ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 1:
+		ssd1306_SetCursor(7, 30);
+		ssd1306_WriteString("   Reset device  ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 2:
+		ssd1306_SetCursor(7, 30);
+		ssd1306_WriteString("   Export mode   ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 3:
+		ssd1306_SetCursor(7, 30);
+		ssd1306_WriteString("Change Protection", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
+	case 4:
+		ssd1306_SetCursor(7, 30);
+		ssd1306_WriteString("      Back       ", Font_7x10, White);
+		ssd1306_UpdateScreen();
+		break;
 
-		}
+	}
 }
-
 
 void settingsMenu() {
 	settingsMenuStatus = 1;
@@ -950,7 +968,7 @@ void changeProtectionMenu() {
 }
 
 void passwordChangeMenu() {
-	passwordInputStatus=1;
+	passwordInputStatus = 1;
 	settingsMenuStatus = 0;
 	setPasswordStep1 = 1;
 	chpassComand = 1;
@@ -962,7 +980,7 @@ void passwordChangeMenu() {
 
 void exportModeMenu() {
 	settingsMenuStatus = 0;
-	exportEnable = 1;
+	dataTransferEnable = 1;
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(2, 5);
 	ssd1306_WriteString("Export mode", Font_7x10, White);
@@ -1009,8 +1027,7 @@ void dataControlMenuDefault() {
 
 }
 
-
-void dataControlMenu(accauntBlock *inn) {
+void dataControlMenu() {
 	/*
 	 ssd1306_Fill(Black);
 	 ssd1306_SetCursor(40,20);
@@ -1026,7 +1043,7 @@ void dataControlMenu(accauntBlock *inn) {
 	updownpointer = 0;
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(40, 3);
-	ssd1306_WriteString(inn->url, Font_7x10, White);
+	ssd1306_WriteString(menu.blocks[menu.pointer].url, Font_7x10, White);
 	ssd1306_Write_To_Bufer(2, 50, 8, 16, lt);
 	ssd1306_Write_To_Bufer(120, 50, 8, 16, rt);
 	dataControlMenuDefault();
@@ -1043,20 +1060,17 @@ void dataControlMenuDown() {
 
 void dataControlMenuUp() {
 	updownpointer++;
-		if (updownpointer > 5) {
-			updownpointer = 0;
+	if (updownpointer > 5) {
+		updownpointer = 0;
 
-		}
-		dataControlMenuDefault();
+	}
+	dataControlMenuDefault();
 }
 
 void dataControlMenuSelect() {
 	switch (updownpointer) {
 	case 0:
-		//HAL_Delay(1000);
-		//CDC_Transmit_FS("log:", 64);
-		//HAL_Delay(10);
-		//strcat(&lg,(&menu.blocks[menu.pointer])->login);
+
 		bufer[0] = 'l';
 		bufer[1] = 'o';
 		bufer[2] = 'g';
@@ -1065,10 +1079,7 @@ void dataControlMenuSelect() {
 		CDC_Transmit_FS(bufer, 20);
 		break;
 	case 1:
-		//HAL_Delay(1000);
-		//CDC_Transmit_FS("pas:", 64);
-		//HAL_Delay(10);
-		//strcat(&pw[],(&menu.blocks[menu.pointer])->password);
+
 		bufer[0] = 'p';
 		bufer[1] = 'a';
 		bufer[2] = 's';
@@ -1084,7 +1095,7 @@ void dataControlMenuSelect() {
 		break;
 	case 3:
 		//инфа
-		dataControlMenuStatus = 0;
+		//dataControlMenuStatus = 0;
 		showDataInfo();
 		break;
 	case 4:
@@ -1102,9 +1113,8 @@ void dataControlMenuSelect() {
 
 void deleteData() {
 	DataCount--;
-	sconstants.blockscount--;
 
-	//menu.pointer = sconstants.blockscount - 1;
+	//menu.pointer = DataCount - 1;
 	accauntBlock buf[DataCount];
 
 	for (uint16_t i = menu.pointer + 1; i < DataCount + 1; i++) {
@@ -1114,35 +1124,35 @@ void deleteData() {
 	}
 
 	menu.pointer--;
-	accauntBlock blocks[sconstants.blockscount + 1];
-	for (uint16_t i = 0; i < sconstants.blockscount; i++) {
+	accauntBlock blocks[DataCount + 1];
+	for (uint16_t i = 0; i < DataCount; i++) {
 		char buf[64] = "";
 		readFromEeprom(startaddressfordata + 64 * i, buf, 64);
 		stringToStruct(&buf, &blocks[i]);
 	}
 	menu.blocks = blocks;
 	menuStatus = 1;
+	uploadDataCount();
 	dataControlMenuStatus = 0;
 	updateScreen();
 
 }
 
 void showDataInfo() {
-
-	DataInfoMenu = 1;
 	dataControlMenuStatus = 0;
+	DataInfoMenu = 1;
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(30, 20);
 	//ssd1306_WriteString("link: ", Font_7x10, White);
 	ssd1306_WriteString((&menu.blocks[menu.pointer])->url, Font_7x10, White);
 	//ssd1306_SetCursor(2, 120);
-    //ssd1306_WriteString("        ", Font_7x10, White);
+	//ssd1306_WriteString("        ", Font_7x10, White);
 	ssd1306_SetCursor(30, 30);
 	//ssd1306_WriteString("link: ", Font_7x10, White);
 	ssd1306_WriteString((&menu.blocks[menu.pointer])->login, Font_7x10, White);
 	ssd1306_SetCursor(30, 40);
 	ssd1306_WriteString("Iteration: ", Font_7x10, White);
-	ssd1306_WriteString((&menu.blocks[menu.pointer])->number, Font_7x10, White);
+	ssd1306_WriteString(menu.blocks[menu.pointer].number, Font_7x10, White);
 	ssd1306_UpdateScreen();
 }
 
@@ -1196,3 +1206,4 @@ void readFromEeprom(uint16_t memoryAddres, uint8_t *data, uint16_t dataLength) {
 	// HAL_Delay(100);
 
 }
+

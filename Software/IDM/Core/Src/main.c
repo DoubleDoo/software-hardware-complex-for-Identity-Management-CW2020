@@ -60,6 +60,7 @@ TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
 
+char ghf[64];
 uint16_t dictionarySeze = 500;
 char *wordsForPassFrase[] = { "aiken", "durga", "essen", "evers", "haiti",
 		"horus", "issus", "kamet", "klimt", "laius", "locke", "lorre", "lowry",
@@ -182,16 +183,21 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	ssd1306_Init();
 	ssd1306_Fill(Black);
-	ssd1306_UpdateScreen();
-	HAL_Delay(1000);
+	uint8_t check = 0;
+	uint8_t lokalcheck = 1;
+
 	initConstants();
-	HAL_Delay(1000);
+
+	ssd1306_UpdateScreen();
+
+	HAL_Delay(500);
 	if (isInit == 0) {
 		deviceIsntInit();
 	}
 
 	else {
 		if (ProtectType == 0) {
+			Unlocked = 1;
 			menuStatus = 1;
 			initMenu();
 		} else if (ProtectType == 1) {
@@ -200,14 +206,25 @@ int main(void) {
 			passwordInputStatus = 1;
 			setPasswordProcess2();
 		} else if (ProtectType == 2) {
+
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 2);
+			ssd1306_WriteString("Conect device to", Font_7x10, White);
+			ssd1306_SetCursor(2, 12);
+			ssd1306_WriteString("your safe PC", Font_7x10, White);
+			ssd1306_UpdateScreen();
 			//
-			menuStatus = 1;
-			initMenu();
+
 		} else if (ProtectType == 3) {
+
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 2);
+			ssd1306_WriteString("Conect device to", Font_7x10, White);
+			ssd1306_SetCursor(2, 12);
+			ssd1306_WriteString("your safe PC", Font_7x10, White);
+			ssd1306_UpdateScreen();
 			//
-			setPasswordStep2 = 1;
-			passwordInputStatus = 1;
-			setPasswordProcess2();
+
 		}
 
 	}
@@ -228,171 +245,288 @@ int main(void) {
 			if (dataReciveBufer[0] == 'P') {
 
 				if (M5PCIDdefaultIsGetted == 0) {
-					for (uint32_t i = 2; i < 27; i++) {
-						PCIDOne[i - 2] = dataReciveBufer[i];
+					for (uint8_t i = 0; i < 24; i++) {
+						PCIDbuf[i] = dataReciveBufer[i + 2];
 					}
-					writeToEeprom(0x0300, &PCIDOne, 24);
+					for (uint8_t i = 0; i < 24; i++) {
+						PCIDOne[i] = PCIDbuf[i];
+					}
+					M5PCIDdefaultIsGetted = 1;
 					M5PPCIDCount = 1;
+
+					uploadPCIDmas();
 					uploadPCIDcount();
-					//M5PPCIDCount = 1;
-					//MD5PCID[0] = PCIDt;
-					//ssd1306_SetCursor(2,10);
-					//ssd1306_WriteString(PCIDt, Font_7x10, White);
-					//uploadPCIDcount();
+					uploadIsfirstPC();
+					CDC_Transmit_FS("OK", 2);
 
-					//uploadPCIDmas();
-
-					//uploadIsfirstPC();
-					//PCIDt="";
-					//MD5PCID[0] = "test";
-					//ssd1306_SetCursor(2,20);
-					//ssd1306_WriteString(MD5PCID[0], Font_7x10, White);
-
-					//downloadPCIDcount();
-					//downloadPCIDmas();
-
-					//ssd1306_SetCursor(2,30);
-					//ssd1306_WriteString(MD5PCID[0], Font_7x10, White);
-					M5PCIDdefaultIsGetted = 1;					//
-					uploadIsfirstPC();					//
 					initStatus = 1;
 					initChoseProcess();
-					CDC_Transmit_FS("OK", 2);
-					//ssd1306_UpdateScreen();
-					//HAL_Delay(2000);
-					//ssd1306_SetCursor(2,10);
-					//ssd1306_WriteString(MD5PCID[0], Font_7x10, White);
-					//downloadPCIDmas() ;
-
 				} else if (addDeviceEnable == 1) {
-
-					if (M5PPCIDCount < 5) {
-						for (uint32_t i = 2; i < 27; i++) {
-							PCIDbuf[i - 2] = dataReciveBufer[i];
+					for (uint8_t i = 0; i < 24; i++) {
+						PCIDbuf[i] = dataReciveBufer[i + 2];
+					}
+					downloadPCIDmas();
+					downloadPCIDcount();
+					lokalcheck = 1;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDOne[i]) {
+							check = 1;
 						}
-						//writeToEeprom(0x0300,&PCIDOne ,24);
-						if (PCIDbuf != PCIDOne && PCIDbuf != PCIDTwo
-								&& PCIDbuf != PCIDThre && PCIDbuf != PCIDFour
-								&& PCIDbuf != PCIDFive) {
-							if (M5PPCIDCount == 1) {
-								writeToEeprom(0x0300 + 24, &PCIDTwo, 24);
-							} else if (M5PPCIDCount == 2) {
-								writeToEeprom(0x0300 + 48, &PCIDThre, 24);
-							} else if (M5PPCIDCount == 3) {
-								writeToEeprom(0x0300 + 72, &PCIDFour, 24);
-							} else if (M5PPCIDCount == 4) {
-								writeToEeprom(0x0300 + 96, &PCIDFive, 24);
-							}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDSeven[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDSix[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDFour[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDFive[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+
+					if (lokalcheck == 1) {
+						if (M5PPCIDCount == 1) {
 							M5PPCIDCount++;
+							//PCIDSeven=PCIDbuf;
+							for (uint8_t i = 0; i < 24; i++) {
+								PCIDSeven[i] = PCIDbuf[i];
+							}
+							uploadPCIDmas();
 							uploadPCIDcount();
 							CDC_Transmit_FS("OK", 2);
-						} else {
-							CDC_Transmit_FS("PC already exist", 16);
+						} else if (M5PPCIDCount == 2) {
+							M5PPCIDCount++;
+							//PCIDSix=PCIDbuf;
+							for (uint8_t i = 0; i < 24; i++) {
+								PCIDSix[i] = PCIDbuf[i];
+							}
+							uploadPCIDmas();
+							uploadPCIDcount();
+							CDC_Transmit_FS("OK", 2);
+						} else if (M5PPCIDCount == 3) {
+							M5PPCIDCount++;
+							//PCIDFour=PCIDbuf;
+							for (uint8_t i = 0; i < 24; i++) {
+								PCIDFour[i] = PCIDbuf[i];
+							}
+							uploadPCIDmas();
+							uploadPCIDcount();
+							CDC_Transmit_FS("OK", 2);
+						} else if (M5PPCIDCount == 4) {
+							M5PPCIDCount++;
+							//PCIDFive=PCIDbuf;
+							for (uint8_t i = 0; i < 24; i++) {
+								PCIDFive[i] = PCIDbuf[i];
+							}
+							uploadPCIDmas();
+							uploadPCIDcount();
+							CDC_Transmit_FS("OK", 2);
+						} else if (M5PPCIDCount == 5) {
+							CDC_Transmit_FS("Your cant add new device", 26);
 						}
-
 						addDeviceEnable = 0;
 						uploadaddDeviceEnable();
-
 					} else {
-						CDC_Transmit_FS("No more space for PC", 27);
+						CDC_Transmit_FS("The device already added", 26);
+						addDeviceEnable = 0;
+						uploadaddDeviceEnable();
 					}
-				} else {
-					for (uint32_t i = 2; i < 27; i++) {
-						PCIDbuf[i - 2] = dataReciveBufer[i];
+				}
+
+				else {
+					for (uint32_t i = 0; i < 24; i++) {
+						PCIDbuf[i] = dataReciveBufer[i + 2];
 					}
-					if (PCIDbuf == PCIDOne || PCIDbuf == PCIDTwo
-							|| PCIDbuf == PCIDThre || PCIDbuf == PCIDFour
-							|| PCIDbuf == PCIDFive) {
+					downloadPCIDmas();
+					downloadPCIDcount();
+					lokalcheck = 1;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDOne[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDSeven[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDSix[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDFour[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+					check = 0;
+					for (uint8_t i = 0; i < 24; i++) {
+						if (PCIDbuf[i] != PCIDFive[i]) {
+							check = 1;
+						}
+					}
+					if (check == 0)
+						lokalcheck = 0;
+
+					if (lokalcheck == 0) {
 						CDC_Transmit_FS("OK", 2);
-						initStatus = 1;
-						initChoseProcess();
-						//
+						if (ProtectType == 2) {
+							Unlocked = 1;
+							menuStatus = 1;
+							initMenu();
+
+						} else if (ProtectType == 3) {
+							setPasswordStep2 = 1;
+							passwordInputStatus = 1;
+							setPasswordProcess2();
+						}
+						//HAL_Delay(1000);
+						//CDC_Transmit_FS("NO", 2);
 					} else {
-						initStatus = 1;
-						initChoseProcess();
-						CDC_Transmit_FS("OK", 18);					//
+						//CDC_Transmit_FS("Your devise is unsuported", 26);
+						CDC_Transmit_FS("NO", 2);
+					}
+				}
+
+				//CDC_Transmit_FS("OK", 2);
+
+			}
+
+			if (Unlocked == 1) {
+				//добавить идент. данные
+				if (dataReciveBufer[0] == 'N') {
+					char str[64] = "";
+					uint8_t pasgen[37] = "";
+					uint8_t domen[16];
+					for (uint32_t i = 0; i < 16; i++) {
+						str[i] = dataReciveBufer[i + 18];
+						domen[i] = dataReciveBufer[i + 18];
+					}
+					downloadPrivate();
+					//uint8_t pasgen[37];
+					for (int i = 0; i < 20; i++) {
+						pasgen[i] = privateKey[i];
+					}
+					for (int i = 20; i < 36; i++) {
+						pasgen[i] = dataReciveBufer[i - 2];
+					}
+					pasgen[16] = (uint8_t) privateKey
+							& (uint8_t) domen + (uint8_t) 1;
+					HAL_HASH_Init(&hhash);
+					HAL_HASH_SHA1_Start(&hhash, &pasgen, 36, &bufer,
+							HAL_MAX_DELAY);
+					HASH_Finish(&hhash, &bufer, HAL_MAX_DELAY);
+					char pass[16];
+					for (int i = 0; i < 16; i++) {
+						pass[i] = bufer[i];
+						bufer[i] = 0;
+					}
+
+					for (uint32_t i = 16; i < 32; i++) {
+						str[i] = pass[i - 16];
+					}
+					for (uint32_t i = 32; i < 48; i++) {
+						str[i] = dataReciveBufer[i - 30];
+					}
+					char iter[16] = "1               ";
+					for (uint32_t i = 48; i < 64; i++) {
+						str[i] = iter[i - 48];
+					}
+					//str[0]=DataCount;
+					writeToEeprom(0x1000 + DataCount * 64, str, 64);
+					DataCount++;
+					uploadDataCount();
+					accauntBlock blocksbuf[DataCount + 1];
+					for (uint16_t i = 0; i < DataCount; i++) {
+
+						readFromEeprom(0x1000 + 64 * i, bufer2, 64);
+						stringToStruct(&bufer2, &blocksbuf[i]);
+					}
+					menu.blocks = blocksbuf;
+					CDC_Transmit_FS(str, 64);
+
+					if (menuStatus) {
+						updateScreen();
 					}
 
 				}
-
-			}
-
-			//добавить идент. данные
-			if (dataReciveBufer[0] == 'N') {
-				char str[64] = "";
-				uint8_t pasgen[37] = "";
-				uint8_t domen[16];
-				for (uint32_t i = 0; i < 16; i++) {
-					str[i] = dataReciveBufer[i + 18];
-					domen[i] = dataReciveBufer[i + 18];
+				//импорт
+				if (dataReciveBufer[0] == 'I') {
+					if (dataTransferEnable == 1) {
+						HAL_Delay(10);
+						CDC_Transmit_FS("begin(", 6);
+						for (uint16_t i = 0; i < DataCount; i++) {
+							char buf[16] = "abc";
+							readFromEeprom(0x1000 + 64 * i, buf, 16);
+							HAL_Delay(10);
+							CDC_Transmit_FS(buf, 16);
+							HAL_Delay(10);
+							readFromEeprom(0x1000 + 64 * i + 32, buf, 32);
+							HAL_Delay(10);
+							CDC_Transmit_FS(buf, 32);
+							HAL_Delay(10);
+						}
+						HAL_Delay(10);
+						CDC_Transmit_FS(")end", 4);
+						HAL_Delay(10);
+						CDC_Transmit_FS("OK", 2);
+					} else {
+						CDC_Transmit_FS("You need Export Mode", 21);
+					}
 				}
-				downloadPrivate();
-				//uint8_t pasgen[37];
-				for (int i = 0; i < 20; i++) {
-					pasgen[i] = privateKey[i];
+				//сброс
+				if (dataReciveBufer[0] == 'C') {
+					//clearDevice();
+					clearDevice();
+					deviceIsntInit();
+					CDC_Transmit_FS("OK", 2);
 				}
-				for (int i = 20; i < 36; i++) {
-					pasgen[i] = dataReciveBufer[i - 2];
-				}
-				pasgen[16] = (uint8_t) privateKey
-						& (uint8_t) domen + (uint8_t) 1;
-				HAL_HASH_Init(&hhash);
-				HAL_HASH_SHA1_Start(&hhash, &pasgen, 36, &bufer, HAL_MAX_DELAY);
-				HASH_Finish(&hhash, &bufer, HAL_MAX_DELAY);
-				char pass[16];
-				for (int i = 0; i < 16; i++) {
-					pass[i] = bufer[i];
-					bufer[i] = 0;
-				}
-
-				for (uint32_t i = 16; i < 32; i++) {
-					str[i] = pass[i - 16];
-				}
-				for (uint32_t i = 32; i < 48; i++) {
-					str[i] = dataReciveBufer[i - 30];
-				}
-				char iter[16] = "1               ";
-				for (uint32_t i = 48; i < 64; i++) {
-					str[i] = iter[i - 48];
-				}
-				//str[0]=DataCount;
-				writeToEeprom(0x1000 + DataCount * 64, str, 64);
-				DataCount++;
-				uploadDataCount();
-				accauntBlock blocksbuf[DataCount + 1];
-				for (uint16_t i = 0; i < DataCount; i++) {
-
-					readFromEeprom(0x1000 + 64 * i, bufer2, 64);
-					stringToStruct(&bufer2, &blocksbuf[i]);
-				}
-				menu.blocks = blocksbuf;
-				sconstants.blockscount = DataCount;
-				CDC_Transmit_FS(str, 64);
-
-			}
-			//импорт
-			if (dataReciveBufer[0] == 'I') {
-				CDC_Transmit_FS("OK", 2);
-				if (exportEnable == 1) {
-					HAL_Delay(300);
-					sendAllData();
+				//добавить безопасный ПК
+				if (dataReciveBufer[0] == 'A') {
+					addDeviceEnable = 1;
+					uploadaddDeviceEnable();
+					// downloadaddDeviceEnable(); uploadaddDeviceEnable();
+					CDC_Transmit_FS("OK", 2);
 				}
 			}
-			//сброс
-			if (dataReciveBufer[0] == 'C') {
-				//clearDevice();
-				clearDevice();
-				deviceIsntInit();
-				CDC_Transmit_FS("OK", 2);
-			}
-			//добавить безопасный ПК
-			if (dataReciveBufer[0] == 'A') {
-				addDeviceEnable = 1;
-				uploadaddDeviceEnable();
-				// downloadaddDeviceEnable(); uploadaddDeviceEnable();
-				CDC_Transmit_FS("OK", 2);
-			}
-
 			for (uint32_t i = 0; i < usbBuferSize; i++) {
 				dataReciveBufer[i] = 0;
 			}
@@ -404,34 +538,7 @@ int main(void) {
 
 	}
 
-	/*
-	 if(dataReciveBufer[0]==(uint8_t)"P")
-	 {
-	 PCReciveProces=1;
-	 ssd1306_SetCursor(2,2);
-	 ssd1306_WriteString(dataReciveBufer, Font_7x10, White);
-	 ssd1306_UpdateScreen();
-	 }
-	 //CDC_Transmit_FS(dataReciveBufer, sizeof(dataReciveBufer));
-	 //for(uint32_t i=0;i<usbBuferSize;i++)
-	 //{
-	 //	  dataReciveBufer[i]=0;
-	 //}
-	 }
-	 //if(PCReciveProces==1)
-	 //{
-	 // 	CDC_Transmit_FS("OK", 2);
-	 // 	HAL_Delay(100);
-	 // 	PCReciveProces=0;
-	 // }
-	 // ssd1306_SetCursor(2,2);
-	 //   			   ssd1306_WriteString(&dataReciveBufer, Font_7x10, White);
-	 // 			   ssd1306_UpdateScreen();
-
-
-	 // CDC_Transmit_FS(wmsg, sizeof(wmsg));
-	 // }
-	 /* USER CODE END 3 */
+	/* USER CODE END 3 */
 }
 
 /**
@@ -684,10 +791,56 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
+void changePasswordData() {
+
+	//CDC_Transmit_FS(menu.blocks[menu.pointer].login, 16);
+	//CDC_Transmit_FS(menu.blocks[menu.pointer].url, 16);
+	//CDC_Transmit_FS(menu.blocks[menu.pointer].number, 16);
+	//char buf[37];
+	//char buf[64];
+	char hashbuf[20];
+	char prepass[37];
+	char str[64];
+	for (uint8_t l = 0; l < 64; l++) {
+		str[l] = 0;
+	}
+	readFromEeprom(0x1000 + 64 * (menu.pointer), &str, 64);
+	downloadPrivate();
+	//CDC_Transmit_FS(str, 64);
+	for (uint8_t l = 0; l < 20; l++) {
+		prepass[l] = privateKey[l];
+	}
+	for (uint8_t l = 0; l < 16; l++) {
+		prepass[20 + l] = str[l];
+	}
+	uint8_t num = (uint8_t) str[48];
+	num++;
+	str[48] = num;
+	prepass[36] = num;
+	HAL_HASH_Init(&hhash);
+	HAL_HASH_SHA1_Start(&hhash, prepass, 37, hashbuf, HAL_MAX_DELAY);
+	HASH_Finish(&hhash, hashbuf, HAL_MAX_DELAY);
+	HAL_HASH_Init(&hhash);
+	for (uint8_t l = 0; l < 16; l++) {
+		str[l + 16] = hashbuf[l + 3];
+	}
+	CDC_Transmit_FS(hashbuf, 20);
+	writeToEeprom(0x1000 + 64 * (menu.pointer), str, 64);
+
+	accauntBlock blocks[DataCount];
+	for (uint16_t i = 0; i < DataCount; i++) {
+		char buf[64] = "";
+		readFromEeprom(0x1000 + 64 * i, buf, 64);
+		stringToStruct(&buf, &blocks[i]);
+	}
+	menu.blocks = blocks;
+
+}
+
 void leftButtonActions() {
-//	ssd1306_SetCursor(10, 0);
-//	ssd1306_WriteString("L", Font_7x10, White);
-//	ssd1306_UpdateScreen();
+	//ssd1306_SetCursor(10, 0);
+	//ssd1306_WriteString("L", Font_7x10, White);
+	//ssd1306_UpdateScreen();
 	if (menuStatus) {
 		menu.pointer--;
 		updateScreen();
@@ -717,15 +870,15 @@ void leftButtonActions() {
 		settingsMenuStatus = 1;
 		ResetComand = 0;
 		settingsMenu();
-	} else if (exportEnable) {
-		exportEnable = 0;
+	} else if (dataTransferEnable) {
+		dataTransferEnable = 0;
 		settingsMenuStatus = 1;
 
 		settingsMenu();
 	} else if (DataInfoMenu) {
 		DataInfoMenu = 0;
-		settingsMenuStatus = 1;
-		settingsMenu();
+		dataControlMenuStatus = 1;
+		dataControlMenu();
 	}
 }
 
@@ -761,23 +914,22 @@ void rightButtonActions() {
 		ResetComand = 0;
 		clearDevice();
 		deviceIsntInit();
-	} else if (exportEnable) {
-		exportEnable = 0;
+	} else if (dataTransferEnable) {
+		dataTransferEnable = 0;
 		settingsMenuStatus = 1;
 
 		settingsMenu();
 	} else if (DataInfoMenu) {
 		DataInfoMenu = 0;
-		settingsMenuStatus = 1;
-
-		settingsMenu();
+		dataControlMenuStatus = 1;
+		dataControlMenu();
 	}
 	//endDataPointer++;
 }
 
 void bothButtonActions() {
 	//ssd1306_SetCursor(17, 0);
-//	ssd1306_WriteString("B", Font_7x10, White);
+	//ssd1306_WriteString("B", Font_7x10, White);
 	//ssd1306_UpdateScreen();
 	//initProcess1();
 	if (menuStatus) {
@@ -802,15 +954,15 @@ void bothButtonActions() {
 		dataControlMenuSelect();
 	} else if (ResetComand) {
 
-	} else if (exportEnable) {
-		exportEnable = 0;
+	} else if (dataTransferEnable) {
+		dataTransferEnable = 0;
 		settingsMenuStatus = 1;
 
 		settingsMenu();
 	} else if (DataInfoMenu) {
 		DataInfoMenu = 0;
-		settingsMenuStatus = 1;
-		settingsMenu();
+		dataControlMenuStatus = 1;
+		dataControlMenu();
 	}
 }
 
@@ -834,14 +986,7 @@ void generatePassFrase() {
 	HAL_HASH_SHA1_Start(&hhash, &privateKey, 60, &publicKey, HAL_MAX_DELAY);
 	HASH_Finish(&hhash, &publicKey, HAL_MAX_DELAY);
 	HAL_HASH_DeInit(&hhash);
-/*	CDC_Transmit_FS("      ", sizeof("      "));
-	HAL_Delay(1000);
-	CDC_Transmit_FS(privateKey, 20);
-	HAL_Delay(1000);
-	CDC_Transmit_FS("      ", sizeof("      "));
-	HAL_Delay(1000);
-	CDC_Transmit_FS(publicKey, 20);
-	HAL_Delay(1000);*/
+
 	uploadPrivate();
 	uploadadPublic();
 }
@@ -867,35 +1012,6 @@ void generateRandomNumbers(uint16_t blocknumber, uint16_t filter) {
 				j++;
 		}
 	}
-}
-
-void changePasswordData() {
-	char buf[64] = "abc";
-	uint8_t pasgen[37] = "";
-	uint8_t domen[16];
-	uint8_t num;
-	readFromEeprom(0x1000 + 64 * (menu.pointer), buf, 64);
-	for (int i = 0; i < 16; i++) {
-		domen[i] = buf[i];
-	}
-	num = (uint8_t) buf[48];
-	num++;
-	buf[48] = num;
-	pasgen[16] = (uint8_t) privateKey & (uint8_t) domen + (uint8_t) num;
-	HAL_HASH_Init(&hhash);
-	HAL_HASH_SHA1_Start(&hhash, &pasgen, 36, &bufer, HAL_MAX_DELAY);
-	HASH_Finish(&hhash, &bufer, HAL_MAX_DELAY);
-	//writeToEeprom(startaddressfordata + 64 *(i-1), buf,64);
-
-	for (uint16_t i = 16; i < 32; i++) {
-		buf[i] = pasgen[i - 16];
-	}
-	writeToEeprom(0x1000 + 64 * (menu.pointer), buf, 64);
-	stringToStruct(&buf, &menu.blocks[menu.pointer]);
-	menuStatus = 1;
-	dataControlMenuStatus = 0;
-	updateScreen();
-
 }
 
 /* USER CODE END 4 */

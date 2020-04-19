@@ -90,6 +90,7 @@ uint8_t* exportEnable;
 uint8_t* addDeviceEnable;
 uint8_t* M5PCIDdefaultIsGetted;
 uint8_t* isInit;
+uint8_t* dataTransferEnable;
 
 //переменные меню
 uint8_t DataInfoMenu;
@@ -108,39 +109,31 @@ char* passFrase[12];
 uint16_t RNGNumbers[12];
 
 //хранение данных о надежных ПК
-uint8_t* M5PPCIDCount;
+uint8_t M5PPCIDCount;
 uint8_t PCIDOne[24];
 uint8_t PCIDTwo[24];
 uint8_t PCIDThre[24];
 uint8_t PCIDFour[24];
 uint8_t PCIDFive[24];
 uint8_t PCIDbuf[24];
-
-typedef struct {
-	uint8_t datacount;
-	uint8_t blockscount;
-	uint8_t startaddressfordata;
-	uint8_t devisescount;
-	uint8_t startaddressfordevices;
-	uint8_t password;
-} constants;
+uint8_t PCIDSix[24];
+uint8_t PCIDSeven[24];
 
 typedef struct {
 	char *login[16];
 	char *password[16];
 	char *url[16];
 	char *number[16];
-} accauntBlock;
+}accauntBlock;
 
 typedef struct {
 	int16_t pointer;
 	accauntBlock *blocks;
-} menuAB;
-
+}menuAB;
 
 menuAB menu;
-constants sconstants;
 int8_t pointer;
+int8_t Unlocked;
 int8_t updownpointer;
 uint8_t password[6];
 uint8_t imputpassword[6];

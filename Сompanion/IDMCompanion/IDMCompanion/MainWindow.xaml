@@ -5,23 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IDMCompanion"
         mc:Ignorable="d"
-        Title="MainWindow" Height="413" Width="800">
+        Title="MainWindow" Height="413" Width="416">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="47*"/>
-            <ColumnDefinition Width="41*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="dataBox" HorizontalAlignment="Left" Margin="236,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="356" Width="546" Grid.ColumnSpan="2"/>
-        <Button x:Name="testButton" Content="Подключиться к устройству" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="183" Height="32" Click="Button_Click"/>
-        <Button Content="Добавить данные" HorizontalAlignment="Left" Margin="10,125,0,0" VerticalAlignment="Top" Width="183" Height="32" Click="Button_Click_1"/>
-        <Button Content="Начать процес инициализации" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" Width="183" Height="35" Click="Button_Click_2"/>
-        <Button Content="Сбросить устройство" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_4"/>
-        <Button Content="Добавить надежный ПК" HorizontalAlignment="Left" Margin="10,218,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_5"/>
-        <TextBox x:Name="comandBox" HorizontalAlignment="Left" Height="23" Margin="10,162,0,0" TextWrapping="Wrap" Text="domen" VerticalAlignment="Top" Width="183" TextChanged="comandBox_TextChanged"/>
-        <TextBox x:Name="inndataBox" HorizontalAlignment="Left" Height="23" Margin="10,190,0,0" TextWrapping="Wrap" Text="login" VerticalAlignment="Top" Width="183"/>
-        <Button Content="Импорт" HorizontalAlignment="Left" Margin="10,256,0,0" VerticalAlignment="Top" Width="183" Height="36" Click="Button_Click_3"/>
-        <Button Content="Восстановление" HorizontalAlignment="Left" Margin="10,297,0,0" VerticalAlignment="Top" Width="183" Height="36" Click="Button_Click_6"/>
-        <Button Content="Отчистить поле" HorizontalAlignment="Left" Margin="10,338,0,0" VerticalAlignment="Top" Width="183" Height="28" Click="Button_Click_7"/>
+        <Button Content="Add data" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="183" Height="32" Click="Button_Click_1"/>
+        <Button Content="Reset device" HorizontalAlignment="Left" Margin="216,94,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_4"/>
+        <Button Content="Add safe PC" HorizontalAlignment="Left" Margin="216,53,0,0" VerticalAlignment="Top" Width="183" Height="33" Click="Button_Click_5"/>
+        <TextBox x:Name="comandBox" HorizontalAlignment="Left" Height="23" Margin="10,53,0,0" TextWrapping="Wrap" Text="domen" VerticalAlignment="Top" Width="183"/>
+        <TextBox x:Name="inndataBox" HorizontalAlignment="Left" Height="23" Margin="10,94,0,0" TextWrapping="Wrap" Text="login" VerticalAlignment="Top" Width="183"/>
+        <Button Content="Import" HorizontalAlignment="Left" Margin="216,10,0,0" VerticalAlignment="Top" Width="183" Height="36" Click="Button_Click_3"/>
+        <Button Content="Clear textbox" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top" Width="389" Height="28" Click="Button_Click_7"/>
+        <TextBox x:Name="dataBox" HorizontalAlignment="Left" Height="198" Margin="10,174,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="389" VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
 
     </Grid>
 </Window>
